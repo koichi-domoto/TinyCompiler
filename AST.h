@@ -110,21 +110,6 @@ namespace rmmc
         }
     };
 
-    // class UnsignedIntegerExpr : public Expression
-    // {
-    // public:
-    //     unsigned long long Value;
-
-    //     UnsignedIntegerExpr(unsigned long long _value, location _loc): Value(_value) {
-    //         loc=_loc;
-    //     }
-    //     ~UnsignedIntegerExpr() {}
-
-    //     virtual void print();
-    //     virtual void toXML();
-    //     virtual llvm::Value *codeGen();
-    // };
-    //<--------------To-Do------------------>
     class BooleanExpr : public Expression
     {
         bool Value;
@@ -137,6 +122,7 @@ namespace rmmc
 
         virtual void print() override
         {
+            std::cout << "Generate constant boolean = " << Value << std::endl;
         }
         virtual std::string toJSON() override;
         virtual llvm::Value *codeGen(CodeGenContext &context) override;
@@ -170,30 +156,15 @@ namespace rmmc
         }
     };
 
-    // class CharExpr : public Expression
-    // {
-    // public:
-    //     char Value;
-
-    //     CharExpr(char _value, location _loc) : Value(_value) {
-    //         loc=_loc;
-    //     }
-    //     ~CharExpr() {}
-
-    //     virtual void print();
-    //     virtual void toXML();
-    //     virtual llvm::Value *codeGen();
-    // };
-
     class IdentifierExpr : public Expression
     {
     public:
         std::string Name;
         bool isType;
         bool isArray;
-        //reverse a[3][2] {2,3}
+        // reverse a[3][2] {2,3}
         std::shared_ptr<ExpressionList> arraySize = std::make_shared<ExpressionList>();
-        
+
         IdentifierExpr(std::string _name) : Name(_name)
         {
         }
@@ -213,59 +184,6 @@ namespace rmmc
             return this->Name;
         }
     };
-
-    // class ArrayIndexExpr : public Expression
-    // {
-    // public:
-    //     std::shared_ptr<IdentifierExpr> arrayName;
-    //     std::shared_ptr<ExpressionList> index = std::make_shared<ExpressionList>();
-    // };
-
-    // class TypeExpr : public Expression
-    // {
-    // public:
-    //     enum BASICTYPE
-    //     {
-    //         INT,
-    //         FLOAT,
-    //         DOUBLE,
-    //         CHAR,
-    //         BOOL,
-    //         STRING,
-    //         VOID,
-    //         STRUCT
-    //     };
-
-    //     BASICTYPE type;
-    //     std::shared_ptr<IdentifierExpr> structName;
-    //     bool isArray = false;
-    //     std::shared_ptr<ExpressionList> arraySize = std::make_shared<ExpressionList>();
-
-    //     TypeExpr() = default;
-
-    //     // primary type
-    //     TypeExpr(BASICTYPE _type) : type(_type)
-    //     {
-    //     }
-    //     // struct type
-    //     TypeExpr(BASICTYPE _type, std::shared_ptr<IdentifierExpr> _structName) : type(_type), structName(_structName)
-    //     {
-    //     }
-    //     // array type
-    //     TypeExpr(BASICTYPE _type, bool _isArray, std::shared_ptr<ExpressionList> _arraySize)
-    //         : type(_type), isArray(_isArray), arraySize(_arraySize)
-    //     {
-    //     }
-
-    //     virtual ~TypeExpr() {}
-    //     virtual void print() override
-    //     {
-    //         std::cout << "Generate Type Expression "
-    //                   << std::endl;
-    //     }
-    //     virtual std::string toJSON() override;
-    //     virtual llvm::Value *codeGen(CodeGenContext &context) override;
-    // };
 
     enum BinaryOperator
     {
@@ -296,12 +214,12 @@ namespace rmmc
 
     enum SingleOperator
     {
-        Negative,//-
+        Negative,    //-
         LOGICAL_NOT, //
         BITWISE_NOT, //~
         INDIRECTION, //*
         ADDRESS_OF,  //&
-        MOVE,        // move
+        MOVE         // move
     };
 
     enum ThreeOperator
@@ -439,7 +357,7 @@ namespace rmmc
         ArrayIndex() = default;
         ArrayIndex(std::shared_ptr<IdentifierExpr> _arrayName,
                    std::shared_ptr<Expression> _index)
-        : arrayName(_arrayName)
+            : arrayName(_arrayName)
         {
             index->push_back(_index);
         }
@@ -483,10 +401,9 @@ namespace rmmc
         std::shared_ptr<IdentifierExpr> VariableName = nullptr;
         std::shared_ptr<ExpressionList> assignmentExpr = std::make_shared<ExpressionList>();
 
-        VariableDeclarationStatement()=default;
+        VariableDeclarationStatement() = default;
         VariableDeclarationStatement(std::shared_ptr<IdentifierExpr> _VariableType,
-                                     std::shared_ptr<IdentifierExpr> _VariableName
-                                    )
+                                     std::shared_ptr<IdentifierExpr> _VariableName)
             : VariableType(_VariableType),
               VariableName(_VariableName)
         {
@@ -502,9 +419,9 @@ namespace rmmc
         VariableDeclarationStatement(std::shared_ptr<IdentifierExpr> _VariableType,
                                      std::shared_ptr<IdentifierExpr> _VariableName,
                                      std::shared_ptr<ExpressionList> _assignmentExpr)
-        : VariableType(_VariableType),
-          VariableName(_VariableName),
-          assignmentExpr(_assignmentExpr)
+            : VariableType(_VariableType),
+              VariableName(_VariableName),
+              assignmentExpr(_assignmentExpr)
         {
         }
 
@@ -514,19 +431,25 @@ namespace rmmc
         {
             return VariableType->isType;
         }
-        bool hasAssignmentExpr(){
-            return assignmentExpr->size()==0 ? false : true ;
+        bool hasAssignmentExpr()
+        {
+            return assignmentExpr->size() == 0 ? false : true;
         }
 
-        std::shared_ptr<IdentifierExpr> getType(){
+        std::shared_ptr<IdentifierExpr> getType()
+        {
             return VariableType;
         }
-        IdentifierExpr getName(){
+        IdentifierExpr getName()
+        {
             return (*VariableName);
         }
 
-        virtual void print() override{
-
+        virtual void print() override
+        {
+            std::cout << "Generating varible declaration: "
+                      << this->VariableType->getName() << " "
+                      << this->VariableName->getName() << std::endl;
         }
         virtual std::string toJSON() override;
         virtual llvm::Value *codeGen(CodeGenContext &context) override;
@@ -607,11 +530,10 @@ namespace rmmc
     public:
         std::shared_ptr<IdentifierExpr> Name = nullptr;
         std::shared_ptr<VariableList> Members = std::make_shared<VariableList>();
-        //std::shared_ptr<FunctionList> FuncMembers = std::make_shared<FunctionList>();
+        // std::shared_ptr<FunctionList> FuncMembers = std::make_shared<FunctionList>();
 
         StructDeclarationStatement(std::shared_ptr<IdentifierExpr> _Name,
-                                   std::shared_ptr<VariableList> _Members
-                                   )
+                                   std::shared_ptr<VariableList> _Members)
             : Name{std::move(_Name)},
               Members{std::move(_Members)}
         {
@@ -645,7 +567,7 @@ namespace rmmc
     {
     public:
         std::shared_ptr<Expression> ReturnValue = nullptr;
-        ReturnStatement()=default;
+        ReturnStatement() = default;
         ReturnStatement(std::shared_ptr<Expression> _ReturnValue)
             : ReturnValue(std::move(_ReturnValue))
         {
@@ -667,7 +589,7 @@ namespace rmmc
         std::shared_ptr<IdentifierExpr> FunctionName = nullptr;
         std::shared_ptr<VariableList> Args = std::make_shared<VariableList>();
         std::shared_ptr<BlockStatement> Content = nullptr;
-        //std::shared_ptr<ReturnStatement> Return = nullptr;
+        // std::shared_ptr<ReturnStatement> Return = nullptr;
         bool isExternal = false;
 
     public:
@@ -675,7 +597,7 @@ namespace rmmc
                                      std::shared_ptr<IdentifierExpr> _FunctionName,
                                      std::shared_ptr<VariableList> _Args,
                                      std::shared_ptr<BlockStatement> _Content,
-                                     //std::shared_ptr<ReturnStatement> _Return,
+                                     // std::shared_ptr<ReturnStatement> _Return,
                                      bool _isExternal = false)
             : ReturnType{std::move(_ReturnType)},
               FunctionName{std::move(_FunctionName)},
@@ -729,8 +651,7 @@ namespace rmmc
 
     public:
         IfStatement(std::shared_ptr<Expression> _Condition,
-                    std::shared_ptr<BlockStatement> _TrueBlock
-                    )
+                    std::shared_ptr<BlockStatement> _TrueBlock)
             : Condition{std::move(_Condition)},
               TrueBlock{std::move(_TrueBlock)}
         {
@@ -781,7 +702,7 @@ namespace rmmc
         std::shared_ptr<Expression> increment = nullptr;
         std::shared_ptr<BlockStatement> content = nullptr;
 
-        ForStatement()=default;
+        ForStatement() = default;
         ForStatement(
             std::shared_ptr<Statement> _initial,
             std::shared_ptr<Expression> _condition,
@@ -792,15 +713,14 @@ namespace rmmc
               increment(_increment),
               content(_content)
         {
-
         }
-        virtual ~ForStatement(){}
+        virtual ~ForStatement() {}
         virtual void print() override
         {
         }
         virtual std::string toJSON() override;
         virtual llvm::Value *codeGen(CodeGenContext &context) override;
-    }; 
+    };
 
     class BreakStatement : public Statement
     {

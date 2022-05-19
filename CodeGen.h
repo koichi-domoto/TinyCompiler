@@ -40,27 +40,35 @@ namespace rmmc
     typedef llvm::Function *FunctionPtr;
     typedef llvm::Value *ValuePtr;
     typedef llvm::BasicBlock *BasicBlockPtr;
+    class CodeGenContext;
     class TypeSystem
     {
     public:
         std::map<TypePtr, std::map<TypePtr, llvm::CastInst::CastOps>> _castTable;
+        TypePtr floatTy;
+        TypePtr intTy;
+        TypePtr charTy;
+        TypePtr doubleTy;
+        TypePtr stringTy;
+        TypePtr voidTy;
+        TypePtr boolTy;
 
         TypeSystem(llvm::LLVMContext &llvmContext)
         {
-            TypePtr floatTy = llvm::Type::getFloatTy(llvmContext);
-            TypePtr intTy = llvm::Type::getInt64Ty(llvmContext);
-            TypePtr charTy = llvm::Type::getInt8Ty(llvmContext);
-            TypePtr doubleTy = llvm::Type::getDoubleTy(llvmContext);
-            TypePtr stringTy = llvm::Type::getInt8PtrTy(llvmContext);
-            TypePtr voidTy = llvm::Type::getVoidTy(llvmContext);
-            TypePtr boolTy = llvm::Type::getInt1Ty(llvmContext);
+            floatTy = llvm::Type::getFloatTy(llvmContext);
+            intTy = llvm::Type::getInt32Ty(llvmContext);
+            charTy = llvm::Type::getInt8Ty(llvmContext);
+            doubleTy = llvm::Type::getDoubleTy(llvmContext);
+            stringTy = llvm::Type::getInt8PtrTy(llvmContext);
+            voidTy = llvm::Type::getVoidTy(llvmContext);
+            boolTy = llvm::Type::getInt1Ty(llvmContext);
             addCast(intTy, floatTy, llvm::CastInst::SIToFP);
             addCast(intTy, doubleTy, llvm::CastInst::SIToFP);
             addCast(boolTy, doubleTy, llvm::CastInst::SIToFP);
             addCast(floatTy, doubleTy, llvm::CastInst::FPExt);
             addCast(floatTy, intTy, llvm::CastInst::FPToSI);
             addCast(doubleTy, intTy, llvm::CastInst::FPToSI);
-            addCast(intTy, intTy, llvm::CastInst::SExt);
+            addCast(intTy, boolTy, llvm::CastInst::SExt);
         }
         void addCast(TypePtr from, TypePtr to, llvm::CastInst::CastOps op)
         {
@@ -87,6 +95,10 @@ namespace rmmc
             }
             return llvm::CastInst::Create(_castTable[from][type], value, type, "cast", block);
         }
+        ValuePtr castToDouble(CodeGenContext& context, ValuePtr value)
+        {
+            //context.theBuilder.CreateIntCast()
+        }
     };
     // llvm::Type* getLLVMType(std::shared_ptr<IdentifierExpr> type, rmmc::CodeGenContext &context)
     // {
@@ -112,6 +124,7 @@ namespace rmmc
         BasicBlockPtr block;
         std::map<std::string, ValuePtr> SymbolTable;
         std::map<std::string, std::shared_ptr<IdentifierExpr> > SymbolType;
+        ValuePtr returnValue;
     };
 
     class CodeGenContext
@@ -134,6 +147,16 @@ namespace rmmc
 
         BasicBlockPtr currentBlock(){
             return blockStack.back()->block;
+        }
+
+        void setCurrentReturnValue(ValuePtr value)
+        {
+            blockStack.back()->returnValue = value;
+        }
+
+        ValuePtr getCurrentReturnValue()
+        {
+            return blockStack.back()->returnValue;
         }
 
         void pushBlock(BasicBlockPtr block)
