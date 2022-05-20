@@ -162,7 +162,7 @@ llvm::Value *rmmc::DoubleExpr::codeGen(CodeGenContext &context)
 llvm::Value *rmmc::IntegerExpr::codeGen(CodeGenContext &context)
 {
     this->print();
-    return llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.theContext), this->Value);
+    return llvm::ConstantInt::get(llvm::Type::getInt32Ty(context.theContext), this->Value);
 }
 
 llvm::Value *rmmc::BooleanExpr::codeGen(CodeGenContext &context)
@@ -173,8 +173,8 @@ llvm::Value *rmmc::BooleanExpr::codeGen(CodeGenContext &context)
 
 llvm::Value *rmmc::StringExpr::codeGen(CodeGenContext &context)
 {
-    // return context.theBuilder.CreateGlobalString(this->Value, "string");
-    return llvm::ConstantDataArray::getString(context.theContext, llvm::StringRef(this->Value), true);
+     return context.theBuilder.CreateGlobalString(this->Value, "string");
+    //return llvm::ConstantDataArray::getString(context.theContext, llvm::StringRef(this->Value), true);
 }
 
 llvm::Value *rmmc::IdentifierExpr::codeGen(CodeGenContext &context)
@@ -187,7 +187,7 @@ llvm::Value *rmmc::IdentifierExpr::codeGen(CodeGenContext &context)
         {
             return LogErrorV("The identifier " + this->getName() + " not find");
         }
-        return context.theBuilder.CreateLoad(val);
+        return val;
     }
     else
     {
@@ -309,14 +309,14 @@ llvm::Value *rmmc::FunctionCallExpr::codeGen(CodeGenContext &context)
     {
         return LogErrorV("Not find the function : " + this->FunctionName->getName());
     }
-    else if (callF->arg_size() != this->Args->size())
-    {
-        std::string error = "Function Args size different : ";
-        error += std::to_string(callF->arg_size());
-        error += "  ";
-        error += std::to_string(this->Args->size());
-        return LogErrorV(error);
-    }
+    // else if (callF->arg_size() != this->Args->size())
+    // {
+    //     std::string error = "Function Args size different : ";
+    //     error += std::to_string(callF->arg_size());
+    //     error += "  ";
+    //     error += std::to_string(this->Args->size());
+    //     return LogErrorV(error);
+    // }
     else
     {
         ExpressionList::iterator it;
@@ -342,10 +342,14 @@ llvm::Value *rmmc::AssignmentExpression::codeGen(CodeGenContext &context)
     {
         return LogErrorV("Assignment LHS is nullptr");
     }
-    TypePtr lType = l->getType();
+    ValuePtr l_val = context.theBuilder.CreateLoad(l);
+    TypePtr lType = l_val->getType();
 
     ValuePtr r = this->RHS->codeGen(context);
+    
+    std::cout << l->getType()->getTypeID() << " " << r->getType()->getTypeID() << std::endl;
     r = context.typeSystem.cast(r, lType, context.currentBlock());
+    
     if (r == nullptr)
     {
         std::cout << l->getType() << " " << r->getType() << std::endl;

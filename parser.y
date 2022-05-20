@@ -60,8 +60,6 @@ stmt : var_decl TSEMICOLON | func_decl | struct_decl
 		 | if_stmt
 		 | for_stmt
 		 | while_stmt
-		 | input TSEMICOLON
-		 | output TSEMICOLON
 		 ;
 
 block : TLBRACE trblk { $$ = $2;}
@@ -116,6 +114,7 @@ ident : TIDENTIFIER { $$ = new rmmc::IdentifierExpr(*$1); }
 
 numeric : TINTEGER { $$ = new rmmc::IntegerExpr(atoi($1->c_str())); }
 				| TDOUBLE { $$ = new rmmc::DoubleExpr(atof($1->c_str())); }
+				| TLITERAL { $$ = new rmmc::StringExpr($1->c_str()); }
 				;
 expr : 	assign { $$ = $1; }
 		 | ident TLPAREN call_args TRPAREN { $$ = new rmmc::FunctionCallExpr(std::shared_ptr<rmmc::IdentifierExpr>($1), std::shared_ptr<rmmc::ExpressionList>($3)); }
@@ -180,7 +179,5 @@ struct_members : /* blank */ { $$ = new rmmc::VariableList(); }
 				| var_decl TSEMICOLON{ $$ = new rmmc::VariableList(); $$->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>($<var_decl>1)); }
 				| struct_members var_decl TSEMICOLON{ $1->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>($<var_decl>2)); }
 
-input : TSCANF TLPAREN  typename TCOMMA ident TRPAREN  { $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($3), std::shared_ptr<rmmc::IdentifierExpr>($5)); }
-output : TPRINTF TLPAREN  typename TCOMMA ident TRPAREN  { $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($3), std::shared_ptr<rmmc::IdentifierExpr>($5)); }
 
 %%

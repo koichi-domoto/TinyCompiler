@@ -138,6 +138,8 @@ namespace rmmc
         std::string Value;
 
     public:
+        StringExpr(char* _value) : Value(_value){
+        }
         StringExpr(std::string _value) : Value(_value)
         {
         }
@@ -160,13 +162,17 @@ namespace rmmc
     {
     public:
         std::string Name;
-        bool isType;
-        bool isArray;
+        bool isType = false;
+        bool isArray = false;
         // reverse a[3][2] {2,3}
         std::shared_ptr<ExpressionList> arraySize = std::make_shared<ExpressionList>();
 
         IdentifierExpr(std::string _name) : Name(_name)
         {
+        }
+        IdentifierExpr(std::string _name, bool _isType, bool _isArray)
+        : Name(_name), isType(_isType), isArray(_isArray)
+        {     
         }
         virtual ~IdentifierExpr() {}
 
