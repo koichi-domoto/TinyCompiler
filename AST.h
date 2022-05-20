@@ -668,6 +668,7 @@ namespace rmmc
 
         virtual void print() override
         {
+            std::cout<<"Generate IfStatement"<<std::endl;
         }
         virtual std::string toJSON() override;
         virtual llvm::Value *codeGen(CodeGenContext &context) override;

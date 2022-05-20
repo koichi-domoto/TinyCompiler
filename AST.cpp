@@ -339,12 +339,12 @@ llvm::Value *rmmc::FunctionDeclarationStatement::codeGen(CodeGenContext &context
     // Generate the code of function content
     this->Content->codeGen(context);
     // Return Value
-    ValuePtr returnVal = context.getCurrentReturnValue();
-    if (returnVal == nullptr){
-        return LogErrorV("Return value is nullptr");
-    }
-    context.theBuilder.CreateRet(returnVal);
-    std::cout << "Return Value Finished" << std::endl;
+    // ValuePtr returnVal = context.getCurrentReturnValue();
+    // if (returnVal == nullptr){
+    //     return LogErrorV("Return value is nullptr");
+    // }
+    // context.theBuilder.CreateRet(returnVal);
+    // std::cout << "Return Value Finished" << std::endl;
     // Pop Block
     context.popBlock();
     llvm::verifyFunction(*func);
@@ -442,7 +442,8 @@ llvm::Value *rmmc::ReturnStatement::codeGen(CodeGenContext &context)
     if (returnVal == nullptr){
         return LogErrorV("return value nullptr");
     }
-    context.setCurrentReturnValue(returnVal);
+    context.theBuilder.CreateRet(returnVal);
+//    context.setCurrentReturnValue(returnVal);
     return returnVal;
 }
 
@@ -453,15 +454,119 @@ llvm::Value *rmmc::TypedefStatement::codeGen(CodeGenContext &context)
 
 llvm::Value *rmmc::IfStatement::codeGen(CodeGenContext &context)
 {
+    ValuePtr condValue = this->Condition->codeGen(context);
+    if(condValue==nullptr){
+        return LogErrorV("The condition of IfStatement is illegal!");
+    }
+
+    FunctionPtr theFunction = context.theBuilder.GetInsertBlock()->getParent();
+
+    condValue = context.theBuilder.CreateFCmpONE(
+        condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "ifcond");
+    
+
+    BasicBlockPtr ThenBB = llvm::BasicBlock::Create(context.theContext, "then", theFunction);
+    BasicBlockPtr ElseBB = llvm::BasicBlock::Create(context.theContext, "else");
+    BasicBlockPtr MergeBB = llvm::BasicBlock::Create(context.theContext, "ifcont");
+
+    context.theBuilder.CreateCondBr(condValue, ThenBB, ElseBB);
+
+    context.theBuilder.SetInsertPoint(ThenBB);
+    context.pushBlock(ThenBB);
+    if(this->TrueBlock!=nullptr) this->TrueBlock->codeGen(context);
+    context.popBlock();
+    context.theBuilder.CreateBr(MergeBB);
+    ThenBB = context.theBuilder.GetInsertBlock();
+
+    theFunction->getBasicBlockList().push_back(ElseBB);
+    
+    context.theBuilder.SetInsertPoint(ElseBB);
+    context.pushBlock(ElseBB);
+    if(this->FalseBlock!=nullptr) this->FalseBlock->codeGen(context);
+    context.popBlock();
+    context.theBuilder.CreateBr(MergeBB);
+    ElseBB = context.theBuilder.GetInsertBlock();
+
+    theFunction->getBasicBlockList().push_back(MergeBB);
+    context.theBuilder.SetInsertPoint(MergeBB);
+
     return nullptr;
 }
 llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
 {
+    FunctionPtr theFunction = context.theBuilder.GetInsertBlock()->getParent();
+    BasicBlockPtr LoopEntryBB = llvm::BasicBlock::Create(context.theContext, "loop_entry", theFunction);
+    BasicBlockPtr LoopBB = llvm::BasicBlock::Create(context.theContext, "loop");
+    BasicBlockPtr LoopAfterBB = llvm::BasicBlock::Create(context.theContext, "loop_after");
+
+    context.theBuilder.CreateBr(LoopEntryBB);
+
+    context.pushBlock(LoopEntryBB);
+    context.theBuilder.SetInsertPoint(LoopEntryBB);
+    //LoopEntryBlock content
+    if(this->initial) this->initial->codeGen(context);
+    if(this->condition==nullptr){
+        return LogErrorV("The forStatement doesn't have jump condition");
+    }
+    ValuePtr condValue = this->condition->codeGen(context);
+    condValue = context.theBuilder.CreateFCmpONE(
+        condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
+    if(condValue==nullptr){
+        return LogErrorV("The jump condition is illegal");
+    }
+    context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
+
+    theFunction->getBasicBlockList().push_back(LoopBB);
+    context.theBuilder.SetInsertPoint(LoopBB);
+    context.pushBlock(LoopBB);
+    this->content->codeGen(context);
+    if(this->increment!=nullptr){
+        this->increment->codeGen(context);
+    }
+    condValue = this->condition->codeGen(context);
+    condValue = context.theBuilder.CreateFCmpONE(
+        condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
+    context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
+    context.popBlock();
+
+    theFunction->getBasicBlockList().push_back(LoopAfterBB);
+    context.theBuilder.SetInsertPoint(LoopAfterBB);
+    //pop loop entry block
+    context.popBlock();
+
     return nullptr;
 }
 
 llvm::Value *rmmc::WhileStatement::codeGen(CodeGenContext &context)
 {
+    FunctionPtr theFunction = context.theBuilder.GetInsertBlock()->getParent();
+    BasicBlockPtr LoopBB = llvm::BasicBlock::Create(context.theContext, "loop", theFunction);
+    BasicBlockPtr LoopAfterBB = llvm::BasicBlock::Create(context.theContext, "loop_after");
+
+    ValuePtr condValue = this->Condition->codeGen(context);
+    condValue = context.theBuilder.CreateFCmpONE(
+        condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
+    if (condValue == nullptr)
+    {
+        return LogErrorV("The jump condition is illegal");
+    }
+    context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
+
+    context.theBuilder.SetInsertPoint(LoopBB);
+    context.pushBlock(LoopBB);
+    if(this->Block!=nullptr)
+    {
+        this->Block->codeGen(context);
+    }
+    condValue = this->Condition->codeGen(context);
+    condValue = context.theBuilder.CreateFCmpONE(
+        condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
+    context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
+    context.popBlock();
+
+    theFunction->getBasicBlockList().push_back(LoopAfterBB);
+    context.theBuilder.SetInsertPoint(LoopAfterBB);
+    
     return nullptr;
 }
 

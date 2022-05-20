@@ -95,10 +95,14 @@ namespace rmmc
             }
             return llvm::CastInst::Create(_castTable[from][type], value, type, "cast", block);
         }
-        ValuePtr castToDouble(CodeGenContext& context, ValuePtr value)
-        {
-            //context.theBuilder.CreateIntCast()
-        }
+        // ValuePtr CastToBool(CodeGenContext& context, ValuePtr value)
+        // {
+        //     context.theBuilder.CreateIntCast();
+        //     if(value->getType()->getTypeID() == llvm::Type::IntegerTyID)
+        //     {
+        //         context.theBuilder.CreateICmpEQ()
+        //     }
+        // }
     };
     // llvm::Type* getLLVMType(std::shared_ptr<IdentifierExpr> type, rmmc::CodeGenContext &context)
     // {
