@@ -32,11 +32,11 @@
 %token <token> TIF TELSE TFOR TWHILE TRETURN TSTRUCT
 
 %type <index> array_index
-%type <ident> ident primary_typename array_typename struct_typename typename
+%type <ident> ident primary_typename array_typename struct_typename typename var_u
 %type <expr> numeric expr assign
 %type <varvec> func_decl_args struct_members
-%type <exprvec> call_args
-%type <block> program stmts block
+%type <exprvec> call_args tbrk
+%type <block> program stmts block trblk
 %type <stmt> stmt var_decl func_decl struct_decl if_stmt for_stmt while_stmt
 %type <token> comparison
 
@@ -48,21 +48,22 @@
 %%
 program : stmts { programBlock = $1; }
 				;
-stmts : stmt { $$ = new rmmc::BlockStatement(); $$->Content->push_back(std::shared_ptr<rmmc::Statement>($1)); }
-			| stmts stmt { $1->Content->push_back(std::shared_ptr<rmmc::Statement>($2)); }
+stmts : stmt { $$ = new rmmc::BlockStatement(); $$->Content->push_back(std::shared_ptr<rmmc::Statement>($1));}
+			| stmts stmt  { $1->Content->push_back(std::shared_ptr<rmmc::Statement>($2)); }
 			;
-stmt : var_decl | func_decl | struct_decl
-		 | expr { $$ = new rmmc::ExpressionStatement(std::shared_ptr<rmmc::Expression>($1)); }
-		 | TRETURN expr { $$ = new rmmc::ReturnStatement(std::shared_ptr<rmmc::Expression>($2)); }
+
+stmt : var_decl TSEMICOLON | func_decl | struct_decl
+		 | expr TSEMICOLON{ $$ = new rmmc::ExpressionStatement(std::shared_ptr<rmmc::Expression>($1)); }
+		 | TRETURN expr TSEMICOLON { $$ = new rmmc::ReturnStatement(std::shared_ptr<rmmc::Expression>($2)); }
 		 | if_stmt
 		 | for_stmt
 		 | while_stmt
 		 ;
 
-block : TLBRACE stmts TRBRACE { $$ = $2; }
-			| TLBRACE TRBRACE { $$ = new rmmc::BlockStatement(); }
+block : TLBRACE trblk { $$ = $2;}
 			;
-
+trblk : stmts TRBRACE { $$ = $1; }
+		 | TLBRACE TRBRACE { $$ = new rmmc::BlockStatement(); }
 primary_typename : TYINT { $$ = new rmmc::IdentifierExpr(*$1); $$->isType = true; }
 					| TYDOUBLE { $$ = new rmmc::IdentifierExpr(*$1); $$->isType = true;  }
 					| TYFLOAT { $$ = new rmmc::IdentifierExpr(*$1); $$->isType = true;  }
@@ -90,9 +91,9 @@ typename : primary_typename { $$ = $1; }
 			| array_typename { $$ = $1; }
 			| struct_typename { $$ = $1; }
 
-var_decl : typename ident { $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($1), std::shared_ptr<rmmc::IdentifierExpr>($2)); }
-				 | typename ident TEQUAL expr { $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($1), std::shared_ptr<rmmc::IdentifierExpr>($2), std::shared_ptr<rmmc::Expression>($4)); }
-				 | typename ident TEQUAL TLBRACKET call_args TRBRACKET {
+var_decl : typename ident  { $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($1), std::shared_ptr<rmmc::IdentifierExpr>($2)); }
+				 | typename ident TEQUAL expr  { $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($1), std::shared_ptr<rmmc::IdentifierExpr>($2), std::shared_ptr<rmmc::Expression>($4)); }
+				 | typename ident TEQUAL  TLBRACKET call_args TRBRACKET  {
 					 $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($1), std::shared_ptr<rmmc::IdentifierExpr>($2), std::shared_ptr<rmmc::ExpressionList>($5));
 				 }
 				 ;
@@ -135,11 +136,11 @@ array_index : ident TLBRACKET expr TRBRACKET
 						$1->index->push_back(std::shared_ptr<rmmc::Expression>($3));
 						$$ = $1;
 					}
-assign : ident TEQUAL expr { $$ = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>($<expr>1), std::shared_ptr<rmmc::Expression>($3)); }
-			| array_index TEQUAL expr {
+assign : ident TEQUAL expr  { $$ = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>($<expr>1), std::shared_ptr<rmmc::Expression>($3)); }
+			| array_index TEQUAL expr  {
 				$$ = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>($1), std::shared_ptr<rmmc::Expression>($3));
 			}
-			| expr TEQUAL expr {
+			| expr TEQUAL expr  {
 				$$ = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>($1), std::shared_ptr<rmmc::Expression>($3)); 
 			}
 			;
