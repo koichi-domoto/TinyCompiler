@@ -29,7 +29,7 @@
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT TSEMICOLON TLBRACKET TRBRACKET TQUOTATION
 %token <token> TPLUS TMINUS TMUL TDIV TAND TOR TXOR TMOD TNEG TNOT TSHIFTL TSHIFTR
-%token <token> TIF TELSE TFOR TWHILE TRETURN TSTRUCT
+%token <token> TIF TELSE TFOR TWHILE TRETURN TSTRUCT TSCANF TPRINT
 
 %type <index> array_index
 %type <ident> ident primary_typename array_typename struct_typename typename var_u
@@ -37,7 +37,7 @@
 %type <varvec> func_decl_args struct_members
 %type <exprvec> call_args tbrk
 %type <block> program stmts block trblk
-%type <stmt> stmt var_decl func_decl struct_decl if_stmt for_stmt while_stmt
+%type <stmt> stmt var_decl func_decl struct_decl if_stmt for_stmt while_stmt input output 
 %type <token> comparison
 
 %left TPLUS TMINUS
@@ -57,7 +57,9 @@ stmt : var_decl TSEMICOLON | func_decl | struct_decl
 		 | TRETURN expr TSEMICOLON { $$ = new rmmc::ReturnStatement(std::shared_ptr<rmmc::Expression>($2)); }
 		 | if_stmt
 		 | for_stmt
-		 | while_stmt
+		 | while_stmt\
+		 | output
+		 | input
 		 ;
 
 block : TLBRACE trblk { $$ = $2;}
@@ -176,4 +178,6 @@ struct_members : /* blank */ { $$ = new rmmc::VariableList(); }
 				| var_decl { $$ = new rmmc::VariableList(); $$->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>($<var_decl>1)); }
 				| struct_members var_decl { $1->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>($<var_decl>2)); }
 
+intput : TSCANF TLPAREN primary_typename TCOMMA ident TRPAREN { $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($3), std::shared_ptr<rmmc::IdentifierExpr>($5)); }
+ 
 %%
