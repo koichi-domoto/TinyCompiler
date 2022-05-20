@@ -45,15 +45,15 @@ namespace rmmc
     {
     public:
         std::map<TypePtr, std::map<TypePtr, llvm::CastInst::CastOps>> _castTable;
-        TypePtr floatTy;
-        TypePtr intTy;
-        TypePtr charTy;
-        TypePtr doubleTy;
-        TypePtr stringTy;
-        TypePtr voidTy;
-        TypePtr boolTy;
+        TypePtr floatTy = nullptr;
+        TypePtr intTy = nullptr;
+        TypePtr charTy = nullptr;
+        TypePtr doubleTy = nullptr;
+        TypePtr stringTy = nullptr;
+        TypePtr voidTy = nullptr;
+        TypePtr boolTy = nullptr;
 
-        TypeSystem(llvm::LLVMContext &llvmContext)
+        TypeSystem(llvm::LLVMContext& llvmContext)
         {
             floatTy = llvm::Type::getFloatTy(llvmContext);
             intTy = llvm::Type::getInt32Ty(llvmContext);

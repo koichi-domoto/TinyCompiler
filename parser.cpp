@@ -514,16 +514,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  43
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   457
+#define YYLAST   511
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  50
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  24
+#define YYNNTS  25
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  77
+#define YYNRULES  78
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  133
+#define YYNSTATES  138
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   304
@@ -575,14 +575,14 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    49,    49,    51,    52,    54,    54,    54,    55,    56,
-      57,    58,    59,    62,    63,    66,    67,    68,    69,    70,
-      71,    72,    74,    79,    84,    89,    90,    91,    93,    94,
-      95,   100,   104,   105,   106,   109,   112,   113,   115,   116,
+       0,    49,    49,    51,    52,    55,    55,    55,    56,    57,
+      58,    59,    60,    63,    65,    66,    67,    68,    69,    70,
+      71,    72,    73,    75,    80,    85,    90,    91,    92,    94,
+      95,    96,   101,   105,   106,   107,   110,   113,   114,   116,
      117,   118,   119,   120,   121,   122,   123,   124,   125,   126,
-     127,   128,   131,   133,   138,   139,   142,   147,   148,   149,
-     150,   151,   152,   153,   154,   155,   156,   157,   158,   160,
-     161,   162,   168,   170,   172,   174,   175,   176
+     127,   128,   129,   132,   134,   139,   140,   143,   148,   149,
+     150,   151,   152,   153,   154,   155,   156,   157,   158,   159,
+     161,   162,   163,   169,   171,   173,   175,   176,   177
 };
 #endif
 
@@ -598,11 +598,11 @@ static const char *const yytname[] =
   "TSEMICOLON", "TLBRACKET", "TRBRACKET", "TQUOTATION", "TPLUS", "TMINUS",
   "TMUL", "TDIV", "TAND", "TOR", "TXOR", "TMOD", "TNEG", "TNOT", "TSHIFTL",
   "TSHIFTR", "TIF", "TELSE", "TFOR", "TWHILE", "TRETURN", "TSTRUCT",
-  "$accept", "program", "stmts", "stmt", "block", "primary_typename",
-  "array_typename", "struct_typename", "typename", "var_decl", "func_decl",
-  "func_decl_args", "ident", "numeric", "expr", "array_index", "assign",
-  "call_args", "comparison", "if_stmt", "for_stmt", "while_stmt",
-  "struct_decl", "struct_members", YY_NULLPTR
+  "$accept", "program", "stmts", "stmt", "block", "trblk",
+  "primary_typename", "array_typename", "struct_typename", "typename",
+  "var_decl", "func_decl", "func_decl_args", "ident", "numeric", "expr",
+  "array_index", "assign", "call_args", "comparison", "if_stmt",
+  "for_stmt", "while_stmt", "struct_decl", "struct_members", YY_NULLPTR
 };
 #endif
 
@@ -619,7 +619,7 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF (-88)
+#define YYPACT_NINF (-92)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -633,20 +633,20 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     159,   -88,   -88,   -88,   -88,   -88,   -88,   -88,   -88,   -88,
-     -88,    21,    21,    21,    -1,     6,    21,     3,    12,   159,
-     -88,    31,    36,   -88,     3,   -88,   -88,    -2,   -88,   369,
-      54,   -88,   -88,   -88,   -88,   -88,   194,   394,   219,   159,
-      21,   369,     8,   -88,   -88,    37,    72,    -6,    21,    21,
-      21,   -88,   -88,   -88,   -88,   -88,   -88,    21,    21,    21,
-      21,    21,    21,   -88,   -88,   -88,    21,    21,    21,    21,
-     -88,    97,    32,    50,   244,   148,    51,    52,    30,   148,
-     369,   369,    19,   269,   369,   369,   394,   394,   419,   419,
-     419,   369,   369,   294,   -88,   128,   -14,    21,    42,     3,
-       3,   -88,    62,   -88,   -88,    21,   369,   -88,    38,   -88,
-      21,   -88,   -88,   -88,   -88,   -88,   319,   -88,   -88,    59,
-     -88,   -88,    -8,    42,   148,   369,    21,   -88,   -88,   -88,
-     344,    42,   -88
+     163,   -92,   -92,   -92,   -92,   -92,   -92,   -92,   -92,   -92,
+     -92,    21,    21,    21,    -1,    11,    21,     3,    12,   163,
+     -92,     6,    13,   -92,     3,    16,   -92,    -2,   -92,   198,
+       7,   -92,   -92,   -92,   -92,   -92,   223,   448,   248,   163,
+      21,   273,    32,   -92,   -92,    57,    58,    -6,   -92,    21,
+      21,    21,   -92,   -92,   -92,   -92,   -92,   -92,    21,    21,
+     -92,    21,    21,    21,    21,   -92,   -92,   -92,    21,    21,
+      21,    21,   -92,   101,    18,    37,   298,   -92,    77,    36,
+      38,   155,    77,   423,   423,     8,   323,   423,   423,   448,
+     448,   473,   473,   473,   423,   423,   348,    42,   132,   -92,
+     -14,    21,    45,     3,     3,   -92,    66,   -92,   -92,    21,
+     423,   -92,    23,   -92,    21,   -92,   -92,   -92,   -92,   -92,
+     -92,   373,   -92,   -92,    50,   -92,   -92,    -8,    45,    77,
+     423,    21,   -92,   -92,   -92,   398,    45,   -92
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -654,36 +654,36 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,    35,    36,    37,    15,    16,    17,    18,    19,    20,
-      21,     0,     0,     0,     0,     0,     0,     0,     0,     2,
-       3,    25,    26,    27,     0,     5,     6,    40,    41,     8,
-      51,    38,    10,    11,    12,     7,     0,    50,     0,     0,
-       0,     9,    24,     1,     4,     0,     0,    28,     0,    57,
-       0,    60,    61,    62,    63,    64,    65,     0,     0,     0,
-       0,     0,     0,    66,    67,    68,     0,     0,     0,     0,
-      49,     0,    69,     0,     0,    75,     0,     0,     0,    32,
-      54,    58,     0,     0,    56,    48,    46,    47,    44,    45,
-      43,    42,    55,     0,    14,     0,     0,     0,     0,     0,
-       0,    76,     0,    22,    23,    57,    29,    33,     0,    39,
-       0,    52,    53,    13,    70,    71,     0,    73,    24,    28,
-      74,    77,     0,     0,     0,    59,     0,    30,    31,    34,
-       0,     0,    72
+       0,    36,    37,    38,    16,    17,    18,    19,    20,    21,
+      22,     0,     0,     0,     0,     0,     0,     0,     0,     2,
+       3,    26,    27,    28,     0,     0,     6,    41,    42,     0,
+      52,    39,    10,    11,    12,     7,     0,    51,     0,     0,
+       0,     0,    25,     1,     4,     0,     0,    29,     5,     0,
+      58,     0,    61,    62,    63,    64,    65,    66,     0,     0,
+       8,     0,     0,     0,     0,    67,    68,    69,     0,     0,
+       0,     0,    50,     0,    70,     0,     0,     9,    76,     0,
+       0,     0,    33,    55,    59,     0,     0,    57,    49,    47,
+      48,    45,    46,    44,    43,    56,     0,     0,     0,    13,
+       0,     0,     0,     0,     0,    77,     0,    23,    24,    58,
+      30,    34,     0,    40,     0,    53,    54,    15,    14,    71,
+      72,     0,    74,    25,    29,    75,    78,     0,     0,     0,
+      60,     0,    31,    32,    35,     0,     0,    73
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -88,   -88,    13,   -16,   -87,   -88,   -88,   -88,   -71,   -62,
-     -88,   -88,   -10,   -88,   -11,   -88,   -88,   -20,   -88,    -5,
-     -88,   -88,   -88,   -88
+     -92,   -92,    19,   -16,   -91,   -92,   -92,   -92,   -92,   -74,
+     -65,   -92,   -92,   -10,   -92,   -11,   -92,   -92,   -30,   -92,
+     -20,   -92,   -92,   -92,   -92
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,    18,    19,    20,    72,    21,    22,    23,    24,    25,
-      26,   108,    27,    28,    29,    30,    31,    82,    67,    32,
-      33,    34,    35,   102
+      -1,    18,    19,    20,    74,    99,    21,    22,    23,    24,
+      25,    26,   112,    27,    28,    29,    30,    31,    85,    69,
+      32,    33,    34,    35,   106
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -691,102 +691,114 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      36,    37,    38,    44,   100,    41,     1,    42,   100,   114,
-      71,   117,    43,   101,    47,    78,    79,   107,   110,    48,
-      49,    39,   127,    73,     1,     2,     3,    50,    40,    74,
-      13,   100,    75,     1,     2,     3,   128,    80,    81,    83,
-     121,    76,   109,    11,   132,   110,    84,    85,    86,    87,
-      88,    89,    11,   100,    12,    90,    91,    92,    93,   105,
-      45,   123,   129,    12,   124,    46,    71,   106,     4,     5,
-       6,     7,     8,     9,    10,    68,    77,    96,    97,    44,
-      78,   103,   104,    69,    95,   122,   116,   120,     0,   118,
-     119,   115,     0,     0,    81,     0,     0,     0,     0,   125,
-       1,     2,     3,     4,     5,     6,     7,     8,     9,    10,
-       0,    99,     0,     0,     0,   130,     0,     0,     0,    11,
-       0,     0,    94,     0,     0,     0,     0,     0,     0,     0,
-      12,     1,     2,     3,     4,     5,     6,     7,     8,     9,
-      10,    13,     0,    14,    15,    16,    17,     0,     0,     0,
-      11,     0,     0,   113,     4,     5,     6,     7,     8,     9,
-      10,    12,     1,     2,     3,     4,     5,     6,     7,     8,
-       9,    10,    13,     0,    14,    15,    16,    17,     0,     0,
-       0,    11,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    12,     0,     0,     0,     0,    99,     0,     0,
-       0,     0,     0,    13,     0,    14,    15,    16,    17,    51,
-      52,    53,    54,    55,    56,    57,     0,    70,     0,     0,
-       0,    58,     0,     0,     0,     0,    59,    60,    61,    62,
-      63,    64,    65,    66,    51,    52,    53,    54,    55,    56,
-      57,     0,     0,    71,     0,     0,    58,     0,     0,     0,
-       0,    59,    60,    61,    62,    63,    64,    65,    66,    51,
-      52,    53,    54,    55,    56,    57,     0,    98,     0,     0,
-       0,    58,     0,     0,     0,     0,    59,    60,    61,    62,
-      63,    64,    65,    66,    51,    52,    53,    54,    55,    56,
-      57,     0,     0,     0,     0,     0,    58,     0,     0,   111,
-       0,    59,    60,    61,    62,    63,    64,    65,    66,    51,
-      52,    53,    54,    55,    56,    57,     0,     0,     0,     0,
-       0,    58,     0,     0,   112,     0,    59,    60,    61,    62,
-      63,    64,    65,    66,    51,    52,    53,    54,    55,    56,
-      57,     0,     0,     0,     0,     0,    58,   126,     0,     0,
-       0,    59,    60,    61,    62,    63,    64,    65,    66,    51,
-      52,    53,    54,    55,    56,    57,     0,   131,     0,     0,
-       0,    58,     0,     0,     0,     0,    59,    60,    61,    62,
-      63,    64,    65,    66,    51,    52,    53,    54,    55,    56,
-      57,     0,     0,     0,     0,     0,    58,     0,     0,     0,
-       0,    59,    60,    61,    62,    63,    64,    65,    66,    51,
-      52,    53,    54,    55,    56,    57,     0,     0,     0,     0,
-       0,    58,     0,     0,     0,     0,     0,     0,    61,    62,
-      63,    64,    65,    66,    51,    52,    53,    54,    55,    56,
-      57,     0,     0,     0,     0,     0,    58,     0,     0,     0,
-       0,     0,     0,     0,     0,    63,    64,    65
+      36,    37,    38,    44,   104,    41,     1,    42,   104,   119,
+      73,   122,    43,   105,    47,    81,    82,   111,   114,    49,
+      50,    39,   132,    75,     1,     2,     3,    51,    70,    76,
+      13,   113,   104,    40,   114,    45,    71,   133,    83,    84,
+      86,   126,    46,    11,    48,   137,   128,    87,    88,   129,
+      89,    90,    91,    92,    12,   104,    78,    93,    94,    95,
+      96,    79,    80,   100,   134,   101,   107,   117,   108,    73,
+     110,    81,     4,     5,     6,     7,     8,     9,    10,   127,
+     120,     0,    44,     4,     5,     6,     7,     8,     9,    10,
+     121,   125,    98,   123,   124,     0,     0,     0,    84,     0,
+       0,     0,     0,   130,     1,     2,     3,     4,     5,     6,
+       7,     8,     9,    10,     0,   103,     0,     0,     0,     0,
+     135,     0,     0,    11,     0,    97,   103,     0,     0,     0,
+       0,     0,     0,     0,    12,     1,     2,     3,     4,     5,
+       6,     7,     8,     9,    10,    13,     0,    14,    15,    16,
+      17,     0,     0,     0,    11,     0,     0,   118,     1,     2,
+       3,     0,     0,     0,     0,    12,     1,     2,     3,     4,
+       5,     6,     7,     8,     9,    10,    13,    11,    14,    15,
+      16,    17,     0,     0,   109,    11,     0,     0,    12,     0,
+       0,     0,     0,     0,     0,     0,    12,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    13,     0,    14,
+      15,    16,    17,    52,    53,    54,    55,    56,    57,    58,
+       0,     0,     0,     0,     0,    59,    60,     0,     0,     0,
+      61,    62,    63,    64,    65,    66,    67,    68,    52,    53,
+      54,    55,    56,    57,    58,     0,    72,     0,     0,     0,
+      59,     0,     0,     0,     0,    61,    62,    63,    64,    65,
+      66,    67,    68,    52,    53,    54,    55,    56,    57,    58,
+       0,     0,    73,     0,     0,    59,     0,     0,     0,     0,
+      61,    62,    63,    64,    65,    66,    67,    68,    52,    53,
+      54,    55,    56,    57,    58,     0,     0,     0,     0,     0,
+      59,    77,     0,     0,     0,    61,    62,    63,    64,    65,
+      66,    67,    68,    52,    53,    54,    55,    56,    57,    58,
+       0,   102,     0,     0,     0,    59,     0,     0,     0,     0,
+      61,    62,    63,    64,    65,    66,    67,    68,    52,    53,
+      54,    55,    56,    57,    58,     0,     0,     0,     0,     0,
+      59,     0,     0,   115,     0,    61,    62,    63,    64,    65,
+      66,    67,    68,    52,    53,    54,    55,    56,    57,    58,
+       0,     0,     0,     0,     0,    59,     0,     0,   116,     0,
+      61,    62,    63,    64,    65,    66,    67,    68,    52,    53,
+      54,    55,    56,    57,    58,     0,     0,     0,     0,     0,
+      59,   131,     0,     0,     0,    61,    62,    63,    64,    65,
+      66,    67,    68,    52,    53,    54,    55,    56,    57,    58,
+       0,   136,     0,     0,     0,    59,     0,     0,     0,     0,
+      61,    62,    63,    64,    65,    66,    67,    68,    52,    53,
+      54,    55,    56,    57,    58,     0,     0,     0,     0,     0,
+      59,     0,     0,     0,     0,    61,    62,    63,    64,    65,
+      66,    67,    68,    52,    53,    54,    55,    56,    57,    58,
+       0,     0,     0,     0,     0,    59,     0,     0,     0,     0,
+       0,     0,    63,    64,    65,    66,    67,    68,    52,    53,
+      54,    55,    56,    57,    58,     0,     0,     0,     0,     0,
+      59,     0,     0,     0,     0,     0,     0,     0,     0,    65,
+      66,    67
 };
 
 static const yytype_int16 yycheck[] =
 {
-      11,    12,    13,    19,    75,    16,     3,    17,    79,    96,
-      24,    98,     0,    75,    24,    21,    22,    79,    26,    21,
-      22,    22,    30,    39,     3,     4,     5,    29,    22,    40,
-      44,   102,    24,     3,     4,     5,   123,    48,    49,    50,
-     102,     4,    23,    22,   131,    26,    57,    58,    59,    60,
-      61,    62,    22,   124,    33,    66,    67,    68,    69,    29,
-      29,    23,   124,    33,    26,    29,    24,    78,     6,     7,
-       8,     9,    10,    11,    12,    21,     4,    45,    28,    95,
-      21,    30,    30,    29,    71,   105,    97,    25,    -1,    99,
-     100,    96,    -1,    -1,   105,    -1,    -1,    -1,    -1,   110,
-       3,     4,     5,     6,     7,     8,     9,    10,    11,    12,
-      -1,    49,    -1,    -1,    -1,   126,    -1,    -1,    -1,    22,
-      -1,    -1,    25,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      33,     3,     4,     5,     6,     7,     8,     9,    10,    11,
-      12,    44,    -1,    46,    47,    48,    49,    -1,    -1,    -1,
-      22,    -1,    -1,    25,     6,     7,     8,     9,    10,    11,
-      12,    33,     3,     4,     5,     6,     7,     8,     9,    10,
-      11,    12,    44,    -1,    46,    47,    48,    49,    -1,    -1,
-      -1,    22,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    33,    -1,    -1,    -1,    -1,    49,    -1,    -1,
-      -1,    -1,    -1,    44,    -1,    46,    47,    48,    49,    15,
-      16,    17,    18,    19,    20,    21,    -1,    23,    -1,    -1,
-      -1,    27,    -1,    -1,    -1,    -1,    32,    33,    34,    35,
-      36,    37,    38,    39,    15,    16,    17,    18,    19,    20,
-      21,    -1,    -1,    24,    -1,    -1,    27,    -1,    -1,    -1,
-      -1,    32,    33,    34,    35,    36,    37,    38,    39,    15,
-      16,    17,    18,    19,    20,    21,    -1,    23,    -1,    -1,
-      -1,    27,    -1,    -1,    -1,    -1,    32,    33,    34,    35,
-      36,    37,    38,    39,    15,    16,    17,    18,    19,    20,
-      21,    -1,    -1,    -1,    -1,    -1,    27,    -1,    -1,    30,
-      -1,    32,    33,    34,    35,    36,    37,    38,    39,    15,
-      16,    17,    18,    19,    20,    21,    -1,    -1,    -1,    -1,
-      -1,    27,    -1,    -1,    30,    -1,    32,    33,    34,    35,
-      36,    37,    38,    39,    15,    16,    17,    18,    19,    20,
-      21,    -1,    -1,    -1,    -1,    -1,    27,    28,    -1,    -1,
-      -1,    32,    33,    34,    35,    36,    37,    38,    39,    15,
-      16,    17,    18,    19,    20,    21,    -1,    23,    -1,    -1,
-      -1,    27,    -1,    -1,    -1,    -1,    32,    33,    34,    35,
-      36,    37,    38,    39,    15,    16,    17,    18,    19,    20,
-      21,    -1,    -1,    -1,    -1,    -1,    27,    -1,    -1,    -1,
-      -1,    32,    33,    34,    35,    36,    37,    38,    39,    15,
-      16,    17,    18,    19,    20,    21,    -1,    -1,    -1,    -1,
-      -1,    27,    -1,    -1,    -1,    -1,    -1,    -1,    34,    35,
-      36,    37,    38,    39,    15,    16,    17,    18,    19,    20,
-      21,    -1,    -1,    -1,    -1,    -1,    27,    -1,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    36,    37,    38
+      11,    12,    13,    19,    78,    16,     3,    17,    82,   100,
+      24,   102,     0,    78,    24,    21,    22,    82,    26,    21,
+      22,    22,    30,    39,     3,     4,     5,    29,    21,    40,
+      44,    23,   106,    22,    26,    29,    29,   128,    49,    50,
+      51,   106,    29,    22,    28,   136,    23,    58,    59,    26,
+      61,    62,    63,    64,    33,   129,    24,    68,    69,    70,
+      71,     4,     4,    45,   129,    28,    30,    25,    30,    24,
+      81,    21,     6,     7,     8,     9,    10,    11,    12,   109,
+     100,    -1,    98,     6,     7,     8,     9,    10,    11,    12,
+     101,    25,    73,   103,   104,    -1,    -1,    -1,   109,    -1,
+      -1,    -1,    -1,   114,     3,     4,     5,     6,     7,     8,
+       9,    10,    11,    12,    -1,    49,    -1,    -1,    -1,    -1,
+     131,    -1,    -1,    22,    -1,    24,    49,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    33,     3,     4,     5,     6,     7,
+       8,     9,    10,    11,    12,    44,    -1,    46,    47,    48,
+      49,    -1,    -1,    -1,    22,    -1,    -1,    25,     3,     4,
+       5,    -1,    -1,    -1,    -1,    33,     3,     4,     5,     6,
+       7,     8,     9,    10,    11,    12,    44,    22,    46,    47,
+      48,    49,    -1,    -1,    29,    22,    -1,    -1,    33,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    33,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    44,    -1,    46,
+      47,    48,    49,    15,    16,    17,    18,    19,    20,    21,
+      -1,    -1,    -1,    -1,    -1,    27,    28,    -1,    -1,    -1,
+      32,    33,    34,    35,    36,    37,    38,    39,    15,    16,
+      17,    18,    19,    20,    21,    -1,    23,    -1,    -1,    -1,
+      27,    -1,    -1,    -1,    -1,    32,    33,    34,    35,    36,
+      37,    38,    39,    15,    16,    17,    18,    19,    20,    21,
+      -1,    -1,    24,    -1,    -1,    27,    -1,    -1,    -1,    -1,
+      32,    33,    34,    35,    36,    37,    38,    39,    15,    16,
+      17,    18,    19,    20,    21,    -1,    -1,    -1,    -1,    -1,
+      27,    28,    -1,    -1,    -1,    32,    33,    34,    35,    36,
+      37,    38,    39,    15,    16,    17,    18,    19,    20,    21,
+      -1,    23,    -1,    -1,    -1,    27,    -1,    -1,    -1,    -1,
+      32,    33,    34,    35,    36,    37,    38,    39,    15,    16,
+      17,    18,    19,    20,    21,    -1,    -1,    -1,    -1,    -1,
+      27,    -1,    -1,    30,    -1,    32,    33,    34,    35,    36,
+      37,    38,    39,    15,    16,    17,    18,    19,    20,    21,
+      -1,    -1,    -1,    -1,    -1,    27,    -1,    -1,    30,    -1,
+      32,    33,    34,    35,    36,    37,    38,    39,    15,    16,
+      17,    18,    19,    20,    21,    -1,    -1,    -1,    -1,    -1,
+      27,    28,    -1,    -1,    -1,    32,    33,    34,    35,    36,
+      37,    38,    39,    15,    16,    17,    18,    19,    20,    21,
+      -1,    23,    -1,    -1,    -1,    27,    -1,    -1,    -1,    -1,
+      32,    33,    34,    35,    36,    37,    38,    39,    15,    16,
+      17,    18,    19,    20,    21,    -1,    -1,    -1,    -1,    -1,
+      27,    -1,    -1,    -1,    -1,    32,    33,    34,    35,    36,
+      37,    38,    39,    15,    16,    17,    18,    19,    20,    21,
+      -1,    -1,    -1,    -1,    -1,    27,    -1,    -1,    -1,    -1,
+      -1,    -1,    34,    35,    36,    37,    38,    39,    15,    16,
+      17,    18,    19,    20,    21,    -1,    -1,    -1,    -1,    -1,
+      27,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,    36,
+      37,    38
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -795,44 +807,44 @@ static const yytype_int8 yystos[] =
 {
        0,     3,     4,     5,     6,     7,     8,     9,    10,    11,
       12,    22,    33,    44,    46,    47,    48,    49,    51,    52,
-      53,    55,    56,    57,    58,    59,    60,    62,    63,    64,
-      65,    66,    69,    70,    71,    72,    64,    64,    64,    22,
-      22,    64,    62,     0,    53,    29,    29,    62,    21,    22,
-      29,    15,    16,    17,    18,    19,    20,    21,    27,    32,
-      33,    34,    35,    36,    37,    38,    39,    68,    21,    29,
-      23,    24,    54,    53,    64,    24,     4,     4,    21,    22,
-      64,    64,    67,    64,    64,    64,    64,    64,    64,    64,
-      64,    64,    64,    64,    25,    52,    45,    28,    23,    49,
-      58,    59,    73,    30,    30,    29,    64,    59,    61,    23,
-      26,    30,    30,    25,    54,    69,    64,    54,    62,    62,
-      25,    59,    67,    23,    26,    64,    28,    30,    54,    59,
-      64,    23,    54
+      53,    56,    57,    58,    59,    60,    61,    63,    64,    65,
+      66,    67,    70,    71,    72,    73,    65,    65,    65,    22,
+      22,    65,    63,     0,    53,    29,    29,    63,    28,    21,
+      22,    29,    15,    16,    17,    18,    19,    20,    21,    27,
+      28,    32,    33,    34,    35,    36,    37,    38,    39,    69,
+      21,    29,    23,    24,    54,    53,    65,    28,    24,     4,
+       4,    21,    22,    65,    65,    68,    65,    65,    65,    65,
+      65,    65,    65,    65,    65,    65,    65,    24,    52,    55,
+      45,    28,    23,    49,    59,    60,    74,    30,    30,    29,
+      65,    60,    62,    23,    26,    30,    30,    25,    25,    54,
+      70,    65,    54,    63,    63,    25,    60,    68,    23,    26,
+      65,    28,    30,    54,    60,    65,    23,    54
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
        0,    50,    51,    52,    52,    53,    53,    53,    53,    53,
-      53,    53,    53,    54,    54,    55,    55,    55,    55,    55,
-      55,    55,    56,    56,    57,    58,    58,    58,    59,    59,
-      59,    60,    61,    61,    61,    62,    63,    63,    64,    64,
-      64,    64,    64,    64,    64,    64,    64,    64,    64,    64,
-      64,    64,    65,    65,    66,    66,    66,    67,    67,    67,
-      68,    68,    68,    68,    68,    68,    68,    68,    68,    69,
-      69,    69,    70,    71,    72,    73,    73,    73
+      53,    53,    53,    54,    55,    55,    56,    56,    56,    56,
+      56,    56,    56,    57,    57,    58,    59,    59,    59,    60,
+      60,    60,    61,    62,    62,    62,    63,    64,    64,    65,
+      65,    65,    65,    65,    65,    65,    65,    65,    65,    65,
+      65,    65,    65,    66,    66,    67,    67,    67,    68,    68,
+      68,    69,    69,    69,    69,    69,    69,    69,    69,    69,
+      70,    70,    70,    71,    72,    73,    74,    74,    74
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     1,     2,     1,     1,     1,     1,     2,
-       1,     1,     1,     3,     2,     1,     1,     1,     1,     1,
-       1,     1,     4,     4,     2,     1,     1,     1,     2,     4,
-       6,     6,     0,     1,     3,     1,     1,     1,     1,     4,
-       1,     1,     3,     3,     3,     3,     3,     3,     3,     3,
-       2,     1,     4,     4,     3,     3,     3,     0,     1,     3,
-       1,     1,     1,     1,     1,     1,     1,     1,     1,     3,
-       5,     5,     9,     5,     5,     0,     1,     2
+       0,     2,     1,     1,     2,     2,     1,     1,     2,     3,
+       1,     1,     1,     2,     2,     2,     1,     1,     1,     1,
+       1,     1,     1,     4,     4,     2,     1,     1,     1,     2,
+       4,     6,     6,     0,     1,     3,     1,     1,     1,     1,
+       4,     1,     1,     3,     3,     3,     3,     3,     3,     3,
+       3,     2,     1,     4,     4,     3,     3,     3,     0,     1,
+       3,     1,     1,     1,     1,     1,     1,     1,     1,     1,
+       3,     5,     5,     9,     5,     5,     0,     1,     2
 };
 
 
@@ -1530,442 +1542,448 @@ yyreduce:
   case 2:
 #line 49 "parser.y"
                 { programBlock = (yyvsp[0].block); }
-#line 1534 "parser.cpp"
+#line 1546 "parser.cpp"
     break;
 
   case 3:
 #line 51 "parser.y"
-             { (yyval.block) = new rmmc::BlockStatement(); (yyval.block)->Content->push_back(std::shared_ptr<rmmc::Statement>((yyvsp[0].stmt))); }
-#line 1540 "parser.cpp"
+             { (yyval.block) = new rmmc::BlockStatement(); (yyval.block)->Content->push_back(std::shared_ptr<rmmc::Statement>((yyvsp[0].stmt)));}
+#line 1552 "parser.cpp"
     break;
 
   case 4:
 #line 52 "parser.y"
-                                     { (yyvsp[-1].block)->Content->push_back(std::shared_ptr<rmmc::Statement>((yyvsp[0].stmt))); }
-#line 1546 "parser.cpp"
-    break;
-
-  case 8:
-#line 55 "parser.y"
-                        { (yyval.stmt) = new rmmc::ExpressionStatement(std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
-#line 1552 "parser.cpp"
-    break;
-
-  case 9:
-#line 56 "parser.y"
-                                { (yyval.stmt) = new rmmc::ReturnStatement(std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
+                                      { (yyvsp[-1].block)->Content->push_back(std::shared_ptr<rmmc::Statement>((yyvsp[0].stmt))); }
 #line 1558 "parser.cpp"
     break;
 
-  case 13:
-#line 62 "parser.y"
-                              { (yyval.block) = (yyvsp[-1].block); }
+  case 8:
+#line 56 "parser.y"
+                                  { (yyval.stmt) = new rmmc::ExpressionStatement(std::shared_ptr<rmmc::Expression>((yyvsp[-1].expr))); }
 #line 1564 "parser.cpp"
     break;
 
-  case 14:
-#line 63 "parser.y"
-                                          { (yyval.block) = new rmmc::BlockStatement(); }
+  case 9:
+#line 57 "parser.y"
+                                           { (yyval.stmt) = new rmmc::ReturnStatement(std::shared_ptr<rmmc::Expression>((yyvsp[-1].expr))); }
 #line 1570 "parser.cpp"
+    break;
+
+  case 13:
+#line 63 "parser.y"
+                      { (yyval.block) = (yyvsp[0].block);}
+#line 1576 "parser.cpp"
+    break;
+
+  case 14:
+#line 65 "parser.y"
+                      { (yyval.block) = (yyvsp[-1].block); }
+#line 1582 "parser.cpp"
     break;
 
   case 15:
 #line 66 "parser.y"
-                         { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true; }
-#line 1576 "parser.cpp"
+                                   { (yyval.block) = new rmmc::BlockStatement(); }
+#line 1588 "parser.cpp"
     break;
 
   case 16:
 #line 67 "parser.y"
-                                                   { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true;  }
-#line 1582 "parser.cpp"
+                         { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true; }
+#line 1594 "parser.cpp"
     break;
 
   case 17:
 #line 68 "parser.y"
-                                                  { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true;  }
-#line 1588 "parser.cpp"
+                                                   { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true;  }
+#line 1600 "parser.cpp"
     break;
 
   case 18:
 #line 69 "parser.y"
-                                                 { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true; }
-#line 1594 "parser.cpp"
+                                                  { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true;  }
+#line 1606 "parser.cpp"
     break;
 
   case 19:
 #line 70 "parser.y"
                                                  { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true; }
-#line 1600 "parser.cpp"
+#line 1612 "parser.cpp"
     break;
 
   case 20:
 #line 71 "parser.y"
                                                  { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true; }
-#line 1606 "parser.cpp"
+#line 1618 "parser.cpp"
     break;
 
   case 21:
 #line 72 "parser.y"
-                                                   { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true;  }
-#line 1612 "parser.cpp"
+                                                 { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true; }
+#line 1624 "parser.cpp"
     break;
 
   case 22:
-#line 74 "parser.y"
+#line 73 "parser.y"
+                                                   { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); (yyval.ident)->isType = true;  }
+#line 1630 "parser.cpp"
+    break;
+
+  case 23:
+#line 75 "parser.y"
                                                                { 
 					(yyvsp[-3].ident)->isArray = true; 
 					(yyvsp[-3].ident)->arraySize->push_back(std::make_shared<rmmc::IntegerExpr>(atoi((yyvsp[-1].string)->c_str()))); 
 					(yyval.ident) = (yyvsp[-3].ident); 
 				}
-#line 1622 "parser.cpp"
+#line 1640 "parser.cpp"
     break;
 
-  case 23:
-#line 79 "parser.y"
+  case 24:
+#line 80 "parser.y"
                                                                               {
 					(yyvsp[-3].ident)->arraySize->push_back(std::make_shared<rmmc::IntegerExpr>(atoi((yyvsp[-1].string)->c_str())));
 					(yyval.ident) = (yyvsp[-3].ident);
 				}
-#line 1631 "parser.cpp"
+#line 1649 "parser.cpp"
     break;
 
-  case 24:
-#line 84 "parser.y"
+  case 25:
+#line 85 "parser.y"
                                 {
 				(yyvsp[0].ident)->isType = true;
 				(yyval.ident) = (yyvsp[0].ident);
 			}
-#line 1640 "parser.cpp"
-    break;
-
-  case 25:
-#line 89 "parser.y"
-                            { (yyval.ident) = (yyvsp[0].ident); }
-#line 1646 "parser.cpp"
+#line 1658 "parser.cpp"
     break;
 
   case 26:
 #line 90 "parser.y"
-                                         { (yyval.ident) = (yyvsp[0].ident); }
-#line 1652 "parser.cpp"
+                            { (yyval.ident) = (yyvsp[0].ident); }
+#line 1664 "parser.cpp"
     break;
 
   case 27:
 #line 91 "parser.y"
-                                          { (yyval.ident) = (yyvsp[0].ident); }
-#line 1658 "parser.cpp"
+                                         { (yyval.ident) = (yyvsp[0].ident); }
+#line 1670 "parser.cpp"
     break;
 
   case 28:
-#line 93 "parser.y"
-                          { (yyval.stmt) = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-1].ident)), std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[0].ident))); }
-#line 1664 "parser.cpp"
+#line 92 "parser.y"
+                                          { (yyval.ident) = (yyvsp[0].ident); }
+#line 1676 "parser.cpp"
     break;
 
   case 29:
 #line 94 "parser.y"
-                                                              { (yyval.stmt) = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-3].ident)), std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-2].ident)), std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
-#line 1670 "parser.cpp"
+                           { (yyval.stmt) = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-1].ident)), std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[0].ident))); }
+#line 1682 "parser.cpp"
     break;
 
   case 30:
 #line 95 "parser.y"
-                                                                                       {
-					 (yyval.stmt) = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-5].ident)), std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-4].ident)), std::shared_ptr<rmmc::ExpressionList>((yyvsp[-1].exprvec)));
-				 }
-#line 1678 "parser.cpp"
+                                                               { (yyval.stmt) = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-3].ident)), std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-2].ident)), std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
+#line 1688 "parser.cpp"
     break;
 
   case 31:
-#line 101 "parser.y"
-                                { (yyval.stmt) = new rmmc::FunctionDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-5].ident)), std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-4].ident)), std::shared_ptr<rmmc::VariableList>((yyvsp[-2].varvec)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block)));  }
-#line 1684 "parser.cpp"
+#line 96 "parser.y"
+                                                                                         {
+					 (yyval.stmt) = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-5].ident)), std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-4].ident)), std::shared_ptr<rmmc::ExpressionList>((yyvsp[-1].exprvec)));
+				 }
+#line 1696 "parser.cpp"
     break;
 
   case 32:
-#line 104 "parser.y"
-                             { (yyval.varvec) = new rmmc::VariableList(); }
-#line 1690 "parser.cpp"
+#line 102 "parser.y"
+                                { (yyval.stmt) = new rmmc::FunctionDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-5].ident)), std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-4].ident)), std::shared_ptr<rmmc::VariableList>((yyvsp[-2].varvec)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block)));  }
+#line 1702 "parser.cpp"
     break;
 
   case 33:
 #line 105 "parser.y"
-                                                                    { (yyval.varvec) = new rmmc::VariableList(); (yyval.varvec)->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>((yyvsp[0].var_decl))); }
-#line 1696 "parser.cpp"
+                             { (yyval.varvec) = new rmmc::VariableList(); }
+#line 1708 "parser.cpp"
     break;
 
   case 34:
 #line 106 "parser.y"
-                                                                                          { (yyvsp[-2].varvec)->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>((yyvsp[0].var_decl))); }
-#line 1702 "parser.cpp"
+                                                                    { (yyval.varvec) = new rmmc::VariableList(); (yyval.varvec)->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>((yyvsp[0].var_decl))); }
+#line 1714 "parser.cpp"
     break;
 
   case 35:
-#line 109 "parser.y"
-                    { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); }
-#line 1708 "parser.cpp"
+#line 107 "parser.y"
+                                                                                          { (yyvsp[-2].varvec)->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>((yyvsp[0].var_decl))); }
+#line 1720 "parser.cpp"
     break;
 
   case 36:
-#line 112 "parser.y"
-                   { (yyval.expr) = new rmmc::IntegerExpr(atoi((yyvsp[0].string)->c_str())); }
-#line 1714 "parser.cpp"
+#line 110 "parser.y"
+                    { (yyval.ident) = new rmmc::IdentifierExpr(*(yyvsp[0].string)); }
+#line 1726 "parser.cpp"
     break;
 
   case 37:
 #line 113 "parser.y"
-                                          { (yyval.expr) = new rmmc::DoubleExpr(atof((yyvsp[0].string)->c_str())); }
-#line 1720 "parser.cpp"
+                   { (yyval.expr) = new rmmc::IntegerExpr(atoi((yyvsp[0].string)->c_str())); }
+#line 1732 "parser.cpp"
     break;
 
   case 38:
-#line 115 "parser.y"
-               { (yyval.expr) = (yyvsp[0].expr); }
-#line 1726 "parser.cpp"
+#line 114 "parser.y"
+                                          { (yyval.expr) = new rmmc::DoubleExpr(atof((yyvsp[0].string)->c_str())); }
+#line 1738 "parser.cpp"
     break;
 
   case 39:
 #line 116 "parser.y"
-                                                   { (yyval.expr) = new rmmc::FunctionCallExpr(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-3].ident)), std::shared_ptr<rmmc::ExpressionList>((yyvsp[-1].exprvec))); }
-#line 1732 "parser.cpp"
+               { (yyval.expr) = (yyvsp[0].expr); }
+#line 1744 "parser.cpp"
     break;
 
   case 40:
 #line 117 "parser.y"
-                         { (yyval.ident) = (yyvsp[0].ident); }
-#line 1738 "parser.cpp"
+                                                   { (yyval.expr) = new rmmc::FunctionCallExpr(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-3].ident)), std::shared_ptr<rmmc::ExpressionList>((yyvsp[-1].exprvec))); }
+#line 1750 "parser.cpp"
     break;
 
-  case 42:
-#line 119 "parser.y"
-                                        { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator((yyvsp[-1].token)) , std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
-#line 1744 "parser.cpp"
+  case 41:
+#line 118 "parser.y"
+                         { (yyval.ident) = (yyvsp[0].ident); }
+#line 1756 "parser.cpp"
     break;
 
   case 43:
 #line 120 "parser.y"
-                                  { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::MOD, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
-#line 1750 "parser.cpp"
+                                        { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator((yyvsp[-1].token)) , std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
+#line 1762 "parser.cpp"
     break;
 
   case 44:
 #line 121 "parser.y"
-                                  { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::MUL, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
-#line 1756 "parser.cpp"
+                                  { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::MOD, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
+#line 1768 "parser.cpp"
     break;
 
   case 45:
 #line 122 "parser.y"
-                                  { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::DIV, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));  }
-#line 1762 "parser.cpp"
+                                  { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::MUL, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
+#line 1774 "parser.cpp"
     break;
 
   case 46:
 #line 123 "parser.y"
-                                   { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::ADD, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));  }
-#line 1768 "parser.cpp"
+                                  { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::DIV, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));  }
+#line 1780 "parser.cpp"
     break;
 
   case 47:
 #line 124 "parser.y"
-                                    { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::SUB, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));  }
-#line 1774 "parser.cpp"
+                                   { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::ADD, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));  }
+#line 1786 "parser.cpp"
     break;
 
   case 48:
 #line 125 "parser.y"
-                                  { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::STRUCT_REF, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));  }
-#line 1780 "parser.cpp"
+                                    { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::SUB, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));  }
+#line 1792 "parser.cpp"
     break;
 
   case 49:
 #line 126 "parser.y"
-                                        { (yyval.expr) = (yyvsp[-1].expr); }
-#line 1786 "parser.cpp"
+                                  { (yyval.expr) = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), rmmc::BinaryOperator::STRUCT_REF, std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));  }
+#line 1798 "parser.cpp"
     break;
 
   case 50:
 #line 127 "parser.y"
-                               { (yyval.expr) = nullptr; /* TODO */ }
-#line 1792 "parser.cpp"
+                                        { (yyval.expr) = (yyvsp[-1].expr); }
+#line 1804 "parser.cpp"
     break;
 
   case 51:
 #line 128 "parser.y"
-                               { (yyval.expr) = (yyvsp[0].index); }
-#line 1798 "parser.cpp"
+                               { (yyval.expr) = nullptr; /* TODO */ }
+#line 1810 "parser.cpp"
     break;
 
   case 52:
-#line 132 "parser.y"
-                                { (yyval.index) = new rmmc::ArrayIndex(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-3].ident)), std::shared_ptr<rmmc::Expression>((yyvsp[-1].expr))); }
-#line 1804 "parser.cpp"
+#line 129 "parser.y"
+                               { (yyval.expr) = (yyvsp[0].index); }
+#line 1816 "parser.cpp"
     break;
 
   case 53:
-#line 134 "parser.y"
+#line 133 "parser.y"
+                                { (yyval.index) = new rmmc::ArrayIndex(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-3].ident)), std::shared_ptr<rmmc::Expression>((yyvsp[-1].expr))); }
+#line 1822 "parser.cpp"
+    break;
+
+  case 54:
+#line 135 "parser.y"
                                         { 	
 						(yyvsp[-3].index)->index->push_back(std::shared_ptr<rmmc::Expression>((yyvsp[-1].expr)));
 						(yyval.index) = (yyvsp[-3].index);
 					}
-#line 1813 "parser.cpp"
-    break;
-
-  case 54:
-#line 138 "parser.y"
-                           { (yyval.expr) = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
-#line 1819 "parser.cpp"
+#line 1831 "parser.cpp"
     break;
 
   case 55:
 #line 139 "parser.y"
-                                                  {
-				(yyval.expr) = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>((yyvsp[-2].index)), std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));
-			}
-#line 1827 "parser.cpp"
+                            { (yyval.expr) = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
+#line 1837 "parser.cpp"
     break;
 
   case 56:
-#line 142 "parser.y"
-                                           {
-				(yyval.expr) = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); 
+#line 140 "parser.y"
+                                                   {
+				(yyval.expr) = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>((yyvsp[-2].index)), std::shared_ptr<rmmc::Expression>((yyvsp[0].expr)));
 			}
-#line 1835 "parser.cpp"
+#line 1845 "parser.cpp"
     break;
 
   case 57:
-#line 147 "parser.y"
-                        { (yyval.exprvec) = new rmmc::ExpressionList(); }
-#line 1841 "parser.cpp"
+#line 143 "parser.y"
+                                            {
+				(yyval.expr) = new rmmc::AssignmentExpression(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); 
+			}
+#line 1853 "parser.cpp"
     break;
 
   case 58:
 #line 148 "parser.y"
-                                               { (yyval.exprvec) = new rmmc::ExpressionList(); (yyval.exprvec)->push_back(std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
-#line 1847 "parser.cpp"
+                        { (yyval.exprvec) = new rmmc::ExpressionList(); }
+#line 1859 "parser.cpp"
     break;
 
   case 59:
 #line 149 "parser.y"
-                                                                { (yyvsp[-2].exprvec)->push_back(std::shared_ptr<Expression>((yyvsp[0].expr))); }
-#line 1853 "parser.cpp"
+                                               { (yyval.exprvec) = new rmmc::ExpressionList(); (yyval.exprvec)->push_back(std::shared_ptr<rmmc::Expression>((yyvsp[0].expr))); }
+#line 1865 "parser.cpp"
     break;
 
   case 60:
 #line 150 "parser.y"
-                   { (yyval.token) = rmmc::BinaryOperator::E; }
-#line 1859 "parser.cpp"
+                                                                { (yyvsp[-2].exprvec)->push_back(std::shared_ptr<Expression>((yyvsp[0].expr))); }
+#line 1871 "parser.cpp"
     break;
 
   case 61:
 #line 151 "parser.y"
-                               { (yyval.token) = rmmc::BinaryOperator::NE; }
-#line 1865 "parser.cpp"
+                   { (yyval.token) = rmmc::BinaryOperator::E; }
+#line 1877 "parser.cpp"
     break;
 
   case 62:
 #line 152 "parser.y"
-                               { (yyval.token) = rmmc::BinaryOperator::LT; }
-#line 1871 "parser.cpp"
+                               { (yyval.token) = rmmc::BinaryOperator::NE; }
+#line 1883 "parser.cpp"
     break;
 
   case 63:
 #line 153 "parser.y"
-                               { (yyval.token) = rmmc::BinaryOperator::ELT; }
-#line 1877 "parser.cpp"
+                               { (yyval.token) = rmmc::BinaryOperator::LT; }
+#line 1889 "parser.cpp"
     break;
 
   case 64:
 #line 154 "parser.y"
-                               { (yyval.token) = rmmc::BinaryOperator::GT; }
-#line 1883 "parser.cpp"
+                               { (yyval.token) = rmmc::BinaryOperator::ELT; }
+#line 1895 "parser.cpp"
     break;
 
   case 65:
 #line 155 "parser.y"
-                               { (yyval.token) = rmmc::BinaryOperator::EGT; }
-#line 1889 "parser.cpp"
+                               { (yyval.token) = rmmc::BinaryOperator::GT; }
+#line 1901 "parser.cpp"
     break;
 
   case 66:
 #line 156 "parser.y"
-                               { (yyval.token) = rmmc::BinaryOperator::AND; }
-#line 1895 "parser.cpp"
+                               { (yyval.token) = rmmc::BinaryOperator::EGT; }
+#line 1907 "parser.cpp"
     break;
 
   case 67:
 #line 157 "parser.y"
-                               { (yyval.token) = rmmc::BinaryOperator::OR; }
-#line 1901 "parser.cpp"
+                               { (yyval.token) = rmmc::BinaryOperator::AND; }
+#line 1913 "parser.cpp"
     break;
 
   case 68:
 #line 158 "parser.y"
-                               { (yyval.token) = rmmc::BinaryOperator::XOR; }
-#line 1907 "parser.cpp"
+                               { (yyval.token) = rmmc::BinaryOperator::OR; }
+#line 1919 "parser.cpp"
     break;
 
   case 69:
-#line 160 "parser.y"
-                         { (yyval.stmt) = new rmmc::IfStatement(std::shared_ptr<rmmc::Expression>((yyvsp[-1].expr)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block))); }
-#line 1913 "parser.cpp"
+#line 159 "parser.y"
+                               { (yyval.token) = rmmc::BinaryOperator::XOR; }
+#line 1925 "parser.cpp"
     break;
 
   case 70:
 #line 161 "parser.y"
-                                             { (yyval.stmt) = new rmmc::IfStatement(std::shared_ptr<rmmc::Expression>((yyvsp[-3].expr)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[-2].block)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block))); }
-#line 1919 "parser.cpp"
+                         { (yyval.stmt) = new rmmc::IfStatement(std::shared_ptr<rmmc::Expression>((yyvsp[-1].expr)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block))); }
+#line 1931 "parser.cpp"
     break;
 
   case 71:
 #line 162 "parser.y"
+                                             { (yyval.stmt) = new rmmc::IfStatement(std::shared_ptr<rmmc::Expression>((yyvsp[-3].expr)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[-2].block)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block))); }
+#line 1937 "parser.cpp"
+    break;
+
+  case 72:
+#line 163 "parser.y"
                                                { 
 			auto blk = new rmmc::BlockStatement(); 
 			blk->Content->push_back(std::shared_ptr<rmmc::Statement>((yyvsp[0].stmt))); 
 			(yyval.stmt) = new rmmc::IfStatement(std::shared_ptr<rmmc::Expression>((yyvsp[-3].expr)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[-2].block)), std::shared_ptr<rmmc::BlockStatement>(blk)); 
 		}
-#line 1929 "parser.cpp"
-    break;
-
-  case 72:
-#line 168 "parser.y"
-                                                                           { (yyval.stmt) = new rmmc::ForStatement(std::shared_ptr<rmmc::Statement>((yyvsp[-6].stmt)), std::shared_ptr<rmmc::Expression>((yyvsp[-4].expr)), std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block))); }
-#line 1935 "parser.cpp"
-    break;
-
-  case 73:
-#line 170 "parser.y"
-                                               { (yyval.stmt) = new rmmc::WhileStatement(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block))); }
-#line 1941 "parser.cpp"
-    break;
-
-  case 74:
-#line 172 "parser.y"
-                                                           {(yyval.stmt) = new rmmc::StructDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-3].ident)), std::shared_ptr<rmmc::VariableList>((yyvsp[-1].varvec))); }
 #line 1947 "parser.cpp"
     break;
 
-  case 75:
-#line 174 "parser.y"
-                             { (yyval.varvec) = new rmmc::VariableList(); }
+  case 73:
+#line 169 "parser.y"
+                                                                           { (yyval.stmt) = new rmmc::ForStatement(std::shared_ptr<rmmc::Statement>((yyvsp[-6].stmt)), std::shared_ptr<rmmc::Expression>((yyvsp[-4].expr)), std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block))); }
 #line 1953 "parser.cpp"
+    break;
+
+  case 74:
+#line 171 "parser.y"
+                                               { (yyval.stmt) = new rmmc::WhileStatement(std::shared_ptr<rmmc::Expression>((yyvsp[-2].expr)), std::shared_ptr<rmmc::BlockStatement>((yyvsp[0].block))); }
+#line 1959 "parser.cpp"
+    break;
+
+  case 75:
+#line 173 "parser.y"
+                                                           {(yyval.stmt) = new rmmc::StructDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>((yyvsp[-3].ident)), std::shared_ptr<rmmc::VariableList>((yyvsp[-1].varvec))); }
+#line 1965 "parser.cpp"
     break;
 
   case 76:
 #line 175 "parser.y"
-                                           { (yyval.varvec) = new rmmc::VariableList(); (yyval.varvec)->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>((yyvsp[0].var_decl))); }
-#line 1959 "parser.cpp"
+                             { (yyval.varvec) = new rmmc::VariableList(); }
+#line 1971 "parser.cpp"
     break;
 
   case 77:
 #line 176 "parser.y"
+                                           { (yyval.varvec) = new rmmc::VariableList(); (yyval.varvec)->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>((yyvsp[0].var_decl))); }
+#line 1977 "parser.cpp"
+    break;
+
+  case 78:
+#line 177 "parser.y"
                                                           { (yyvsp[-1].varvec)->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>((yyvsp[0].var_decl))); }
-#line 1965 "parser.cpp"
+#line 1983 "parser.cpp"
     break;
 
 
-#line 1969 "parser.cpp"
+#line 1987 "parser.cpp"
 
       default: break;
     }
@@ -2197,4 +2215,4 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 178 "parser.y"
+#line 179 "parser.y"

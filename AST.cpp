@@ -29,7 +29,7 @@ typedef llvm::Function *FunctionPtr;
 typedef llvm::Value *ValuePtr;
 typedef llvm::StructType *StructTypePtr;
 
-    using namespace llvm;
+using namespace llvm;
 using namespace rmmc;
 
 // class Error
@@ -49,7 +49,7 @@ using namespace rmmc;
 
 void LogError(std::string Str)
 {
-    std::cout<<Str<<std::endl;
+    std::cout << Str << std::endl;
     return;
 }
 
@@ -59,22 +59,72 @@ llvm::Value *LogErrorV(std::string Str)
     return nullptr;
 }
 
+llvm::Type *LogErrorT(std::string Str)
+{
+    LogError(Str);
+    return nullptr;
+}
+
 llvm::Type *getLLVMType(std::shared_ptr<IdentifierExpr> type, rmmc::CodeGenContext &context)
 {
-    // std::string name = type->getName();
-    // std::cout << "getLLVMType: " << name << std::endl;
-    // // std::cout<<name.compare("int")<<std::endl;
-    // if (!name.compare("int"))
-    //     return llvm::Type::getInt32Ty(context.theContext);
-    // if (!name.compare("string"))
-    //     return llvm::Type::getInt8PtrTy(context.theContext);
-    // std::cout << "Return nullptr" << std::endl;
+    assert(type->isType == true);
+    std::string name = type->getName();
+    std::cout << "getLLVMType: " << name << std::endl;
+    if (type->isArray == false)
+    {
+        if (!name.compare("bool"))
+        {
+            return context.typeSystem.boolTy;
+        }
+        else if (!name.compare("int"))
+        {
+            std::cout<<"intTy"<<std::endl;
+            return context.typeSystem.intTy;
+        }
+        else if (!name.compare("float"))
+        {
+            return context.typeSystem.floatTy;
+        }
+        else if (!name.compare("double"))
+        {
+            return context.typeSystem.doubleTy;
+        }
+        else if (!name.compare("void"))
+        {
+            return context.typeSystem.voidTy;
+        }
+        else if (!name.compare("string"))
+        {
+            return context.typeSystem.stringTy;
+        }
+        else if (!name.compare("char"))
+        {
+            return context.typeSystem.charTy;
+        }
+        else
+        {
+            StructTypePtr structType = context.theModule->getTypeByName("name");
+            if (structType == nullptr)
+            {
+                return LogErrorT("The type is illegal");
+            }
+            else
+            {
+                return structType;
+            }
+        }
+    }
+    else
+    {
+        return nullptr;
+    }
     return nullptr;
 }
 
 llvm::Value *rmmc::ExpressionStatement::codeGen(CodeGenContext &context)
 {
-    if(this->expr==nullptr){
+    if (this->expr == nullptr)
+    {
         return LogErrorV("The ExpressionStatement doesn't have expr");
     }
     return this->expr->codeGen(context);
@@ -84,17 +134,20 @@ llvm::Value *rmmc::ArrayIndex::codeGen(CodeGenContext &context)
 {
     this->print();
     ValuePtr array = context.getSymbolTable(this->arrayName->getName());
-    if(array==nullptr){
+    if (array == nullptr)
+    {
         return LogErrorV("The array doesn't exist");
     }
     ValuePtr con_0 = std::make_shared<rmmc::IntegerExpr>(0)->codeGen(context);
     std::vector<ValuePtr> Idxs;
     Idxs.push_back(con_0);
-    for(auto& perIdx : *this->index){
-        Idxs.push_back( perIdx->codeGen(context) );
+    for (auto &perIdx : *this->index)
+    {
+        Idxs.push_back(perIdx->codeGen(context));
     }
     ValuePtr array_i = context.theBuilder.CreateInBoundsGEP(array, llvm::ArrayRef(Idxs));
-    if(array_i==nullptr){
+    if (array_i == nullptr)
+    {
         return LogErrorV("The array index is illegal");
     }
     return context.theBuilder.CreateLoad(array_i);
@@ -142,18 +195,17 @@ llvm::Value *rmmc::IdentifierExpr::codeGen(CodeGenContext &context)
     }
 }
 
-
 llvm::Value *rmmc::SingleOperatorExpr::codeGen(CodeGenContext &context)
 {
     this->print();
     ValuePtr exp = this->Expr->codeGen(context);
-    assert(exp!=nullptr);
+    assert(exp != nullptr);
+    ValuePtr con_neg_1 = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.theContext), -1);
     switch (Type)
     {
-    case rmmc::SingleOperator::Negative:
-        ValuePtr con_neg_1 = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.theContext), -1);
+    case Negative:
         return context.theBuilder.CreateFMul(exp, con_neg_1, "fmul");
-    case rmmc::SingleOperator::LOGICAL_NOT:
+    case LOGICAL_NOT:
         return context.theBuilder.CreateNot(exp, "not");
     default:
         return LogErrorV("Not support the single-operator");
@@ -166,14 +218,15 @@ llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
     this->print();
     ValuePtr lhs = this->LHS->codeGen(context);
     ValuePtr rhs = this->RHS->codeGen(context);
-    assert(lhs!=nullptr);
-    assert(rhs!=nullptr);
+    assert(lhs != nullptr);
+    assert(rhs != nullptr);
     TypePtr lType = lhs->getType();
     TypePtr rType = rhs->getType();
 
-    bool allInt =( (lhs->getType()->getTypeID() == llvm::Type::IntegerTyID) && (rhs->getType()->getTypeID() == llvm::Type::IntegerTyID) );
+    bool allInt = ((lhs->getType()->getTypeID() == llvm::Type::IntegerTyID) && (rhs->getType()->getTypeID() == llvm::Type::IntegerTyID));
 
-    if(allInt==true){
+    if (allInt == true)
+    {
         switch (this->Type)
         {
         case ADD:
@@ -205,10 +258,13 @@ llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
         default:
             return LogErrorV("Not support the binary operator");
         }
-    }else{
+    }
+    else
+    {
         ValuePtr lhs_double = context.typeSystem.cast(lhs, context.typeSystem.doubleTy, context.currentBlock());
         ValuePtr rhs_double = context.typeSystem.cast(lhs, context.typeSystem.doubleTy, context.currentBlock());
-        if( lhs_double==nullptr || rhs_double==nullptr ){
+        if (lhs_double == nullptr || rhs_double == nullptr)
+        {
             return LogErrorV("The LHS or RHS has illegal type in BinaryOperatorStatement");
         }
         switch (this->Type)
@@ -239,7 +295,7 @@ llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
     }
     return nullptr;
 }
-//to-do-1
+// to-do-1
 llvm::Value *rmmc::ThreeOperatorExpr::codeGen(CodeGenContext &context)
 {
     return nullptr;
@@ -256,9 +312,9 @@ llvm::Value *rmmc::FunctionCallExpr::codeGen(CodeGenContext &context)
     else if (callF->arg_size() != this->Args->size())
     {
         std::string error = "Function Args size different : ";
-        error += std::to_string( callF->arg_size() );
+        error += std::to_string(callF->arg_size());
         error += "  ";
-        error += std::to_string( this->Args->size() );
+        error += std::to_string(this->Args->size());
         return LogErrorV(error);
     }
     else
@@ -287,7 +343,7 @@ llvm::Value *rmmc::AssignmentExpression::codeGen(CodeGenContext &context)
         return LogErrorV("Assignment LHS is nullptr");
     }
     TypePtr lType = l->getType();
-    
+
     ValuePtr r = this->RHS->codeGen(context);
     r = context.typeSystem.cast(r, lType, context.currentBlock());
     if (r == nullptr)
@@ -307,17 +363,20 @@ llvm::Value *rmmc::FunctionDeclarationStatement::codeGen(CodeGenContext &context
     VariableList::iterator it;
     for (auto &perArg : *Args)
     {
+        std::cout<<"process args....."<<std::endl;
         funcArgs.push_back(getLLVMType(perArg->getType(), context));
     }
     std::cout << "Args finished" << std::endl;
     // Construct function return type
     TypePtr retType = getLLVMType(ReturnType, context);
-    if (retType == nullptr){
+    if (retType == nullptr)
+    {
         return LogErrorV("Return type is nullptr");
     }
     std::cout << "Return Type Finished" << std::endl;
+    std::cout << retType->getTypeID() <<std::endl;
     // get function type and construct function
-    FunctionTypePtr funcType = llvm::FunctionType::get(retType, funcArgs, false);
+    FunctionTypePtr funcType = llvm::FunctionType::get(retType, llvm::ArrayRef(funcArgs), false);
     std::cout << "Func Type Finished" << std::endl;
     FunctionPtr func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, this->FunctionName->getName().c_str(), context.theModule.get());
     std::cout << "Func Finished" << std::endl;
@@ -355,12 +414,13 @@ llvm::Value *rmmc::FunctionDeclarationStatement::codeGen(CodeGenContext &context
 llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context)
 {
     this->print();
-    assert(this->VariableType->isType==true);
-    if(this->VariableType->isArray){
-        uint64_t arraySize=1;
-        for(auto it=this->VariableType->arraySize->begin();it!=this->VariableType->arraySize->end();it++)
+    assert(this->VariableType->isType == true);
+    if (this->VariableType->isArray)
+    {
+        uint64_t arraySize = 1;
+        for (auto it = this->VariableType->arraySize->begin(); it != this->VariableType->arraySize->end(); it++)
         {
-            IntegerExpr *perSize = dynamic_cast<IntegerExpr*>(it->get());
+            IntegerExpr *perSize = dynamic_cast<IntegerExpr *>(it->get());
             arraySize *= perSize->getValue();
         }
         ArrayTypePtr type = llvm::ArrayType::get(getLLVMType(this->VariableType, context), arraySize);
@@ -368,7 +428,9 @@ llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context
         context.setSymbolTable(this->VariableName->getName(), alloca);
         context.setSymbolType(this->VariableName->getName(), this->VariableType);
         return alloca;
-    }else{
+    }
+    else
+    {
         TypePtr type = getLLVMType(this->VariableType, context);
         ValuePtr alloca = context.theBuilder.CreateAlloca(type);
         context.setSymbolTable(this->VariableName->getName(), alloca);
@@ -408,16 +470,17 @@ llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context
 llvm::Value *rmmc::StructDeclarationStatement::codeGen(CodeGenContext &context)
 {
     StructTypePtr structType = context.theModule->getTypeByName(this->Name->getName());
-    if(structType){
+    if (structType)
+    {
         return LogErrorV("The struct already exists");
     }
     structType = llvm::StructType::create(context.theContext, this->Name->getName());
     std::vector<TypePtr> memberType;
-    for(auto& perMember : *this->Members)
+    for (auto &perMember : *this->Members)
     {
-        memberType.push_back( perMember->codeGen(context)->getType() );
+        memberType.push_back(perMember->codeGen(context)->getType());
     }
-    structType->setBody( llvm::ArrayRef(memberType) );
+    structType->setBody(llvm::ArrayRef(memberType));
     return nullptr;
 }
 
@@ -439,11 +502,12 @@ llvm::Value *rmmc::BlockStatement::codeGen(CodeGenContext &context)
 llvm::Value *rmmc::ReturnStatement::codeGen(CodeGenContext &context)
 {
     ValuePtr returnVal = this->ReturnValue->codeGen(context);
-    if (returnVal == nullptr){
+    if (returnVal == nullptr)
+    {
         return LogErrorV("return value nullptr");
     }
     context.theBuilder.CreateRet(returnVal);
-//    context.setCurrentReturnValue(returnVal);
+    //    context.setCurrentReturnValue(returnVal);
     return returnVal;
 }
 
@@ -455,7 +519,8 @@ llvm::Value *rmmc::TypedefStatement::codeGen(CodeGenContext &context)
 llvm::Value *rmmc::IfStatement::codeGen(CodeGenContext &context)
 {
     ValuePtr condValue = this->Condition->codeGen(context);
-    if(condValue==nullptr){
+    if (condValue == nullptr)
+    {
         return LogErrorV("The condition of IfStatement is illegal!");
     }
 
@@ -463,7 +528,6 @@ llvm::Value *rmmc::IfStatement::codeGen(CodeGenContext &context)
 
     condValue = context.theBuilder.CreateFCmpONE(
         condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "ifcond");
-    
 
     BasicBlockPtr ThenBB = llvm::BasicBlock::Create(context.theContext, "then", theFunction);
     BasicBlockPtr ElseBB = llvm::BasicBlock::Create(context.theContext, "else");
@@ -473,16 +537,18 @@ llvm::Value *rmmc::IfStatement::codeGen(CodeGenContext &context)
 
     context.theBuilder.SetInsertPoint(ThenBB);
     context.pushBlock(ThenBB);
-    if(this->TrueBlock!=nullptr) this->TrueBlock->codeGen(context);
+    if (this->TrueBlock != nullptr)
+        this->TrueBlock->codeGen(context);
     context.popBlock();
     context.theBuilder.CreateBr(MergeBB);
     ThenBB = context.theBuilder.GetInsertBlock();
 
     theFunction->getBasicBlockList().push_back(ElseBB);
-    
+
     context.theBuilder.SetInsertPoint(ElseBB);
     context.pushBlock(ElseBB);
-    if(this->FalseBlock!=nullptr) this->FalseBlock->codeGen(context);
+    if (this->FalseBlock != nullptr)
+        this->FalseBlock->codeGen(context);
     context.popBlock();
     context.theBuilder.CreateBr(MergeBB);
     ElseBB = context.theBuilder.GetInsertBlock();
@@ -503,15 +569,18 @@ llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
 
     context.pushBlock(LoopEntryBB);
     context.theBuilder.SetInsertPoint(LoopEntryBB);
-    //LoopEntryBlock content
-    if(this->initial) this->initial->codeGen(context);
-    if(this->condition==nullptr){
+    // LoopEntryBlock content
+    if (this->initial)
+        this->initial->codeGen(context);
+    if (this->condition == nullptr)
+    {
         return LogErrorV("The forStatement doesn't have jump condition");
     }
     ValuePtr condValue = this->condition->codeGen(context);
     condValue = context.theBuilder.CreateFCmpONE(
         condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
-    if(condValue==nullptr){
+    if (condValue == nullptr)
+    {
         return LogErrorV("The jump condition is illegal");
     }
     context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
@@ -520,7 +589,8 @@ llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
     context.theBuilder.SetInsertPoint(LoopBB);
     context.pushBlock(LoopBB);
     this->content->codeGen(context);
-    if(this->increment!=nullptr){
+    if (this->increment != nullptr)
+    {
         this->increment->codeGen(context);
     }
     condValue = this->condition->codeGen(context);
@@ -531,7 +601,7 @@ llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
 
     theFunction->getBasicBlockList().push_back(LoopAfterBB);
     context.theBuilder.SetInsertPoint(LoopAfterBB);
-    //pop loop entry block
+    // pop loop entry block
     context.popBlock();
 
     return nullptr;
@@ -554,7 +624,7 @@ llvm::Value *rmmc::WhileStatement::codeGen(CodeGenContext &context)
 
     context.theBuilder.SetInsertPoint(LoopBB);
     context.pushBlock(LoopBB);
-    if(this->Block!=nullptr)
+    if (this->Block != nullptr)
     {
         this->Block->codeGen(context);
     }
@@ -566,7 +636,7 @@ llvm::Value *rmmc::WhileStatement::codeGen(CodeGenContext &context)
 
     theFunction->getBasicBlockList().push_back(LoopAfterBB);
     context.theBuilder.SetInsertPoint(LoopAfterBB);
-    
+
     return nullptr;
 }
 
