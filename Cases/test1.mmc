@@ -1,5 +1,7 @@
 int main()
 {
-	printf("HelloWorld");
+	int a;
+	a=1;
+	printf("HelloWorld=%d",a);
 	return 0;
 }

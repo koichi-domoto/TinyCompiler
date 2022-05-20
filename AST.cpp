@@ -173,7 +173,7 @@ llvm::Value *rmmc::BooleanExpr::codeGen(CodeGenContext &context)
 
 llvm::Value *rmmc::StringExpr::codeGen(CodeGenContext &context)
 {
-     return context.theBuilder.CreateGlobalString(this->Value, "string");
+    return context.theBuilder.CreateGlobalString(this->Value, "string");
     //return llvm::ConstantDataArray::getString(context.theContext, llvm::StringRef(this->Value), true);
 }
 
@@ -328,6 +328,9 @@ llvm::Value *rmmc::FunctionCallExpr::codeGen(CodeGenContext &context)
             {
                 return LogErrorV("The function params is nullptr");
             }
+            if( dynamic_cast<rmmc::IdentifierExpr*>((*it).get()) !=nullptr ){
+                tmp = context.theBuilder.CreateLoad(tmp);
+            }
             callArgs.push_back(tmp);
         }
         return context.theBuilder.CreateCall(callF, callArgs, "callF");
@@ -337,15 +340,21 @@ llvm::Value *rmmc::FunctionCallExpr::codeGen(CodeGenContext &context)
 llvm::Value *rmmc::AssignmentExpression::codeGen(CodeGenContext &context)
 {
     this->print();
-    ValuePtr l = this->LHS->codeGen(context);
+    ValuePtr l=nullptr;
+    ValuePtr l_val=nullptr;
+    // if( dynamic_cast< IdentifierExpr* >(this->LHS.get()) != nullptr )
+    // {
+    // }
+    l = this->LHS->codeGen(context);
     if (l == nullptr)
     {
         return LogErrorV("Assignment LHS is nullptr");
     }
-    ValuePtr l_val = context.theBuilder.CreateLoad(l);
+    l_val = context.theBuilder.CreateLoad(l);
     TypePtr lType = l_val->getType();
 
     ValuePtr r = this->RHS->codeGen(context);
+    
     
     std::cout << l->getType()->getTypeID() << " " << r->getType()->getTypeID() << std::endl;
     r = context.typeSystem.cast(r, lType, context.currentBlock());
@@ -355,6 +364,8 @@ llvm::Value *rmmc::AssignmentExpression::codeGen(CodeGenContext &context)
         std::cout << l->getType() << " " << r->getType() << std::endl;
         return LogErrorV("l  and r type different");
     }
+    //ValuePtr r_val = context.theBuilder.CreateLoad(r);
+    //std::cout<< l->getValueName() <<std::endl;
     context.theBuilder.CreateStore(r, l);
     return l;
 }
