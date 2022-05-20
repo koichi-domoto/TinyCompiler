@@ -18,6 +18,8 @@
 	rmmc::Statement* stmt;
 	rmmc::IdentifierExpr* ident;
 	rmmc::VariableDeclarationStatement* var_decl;
+	rmmc::VariableDeclarationStatement* input;
+	rmmc::VariableDeclarationStatement* output;
 	rmmc::ArrayIndex* index;
 	std::vector< std::shared_ptr<rmmc::VariableDeclarationStatement> >*  varvec;
 	std::vector< std::shared_ptr<rmmc::Expression> >* exprvec;
@@ -29,15 +31,15 @@
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT TSEMICOLON TLBRACKET TRBRACKET TQUOTATION
 %token <token> TPLUS TMINUS TMUL TDIV TAND TOR TXOR TMOD TNEG TNOT TSHIFTL TSHIFTR
-%token <token> TIF TELSE TFOR TWHILE TRETURN TSTRUCT
+%token <token> TIF TELSE TFOR TWHILE TRETURN TSTRUCT TSCANF TPRINTF
 
 %type <index> array_index
-%type <ident> ident primary_typename array_typename struct_typename typename var_u
-%type <expr> numeric expr assign
-%type <varvec> func_decl_args struct_members
-%type <exprvec> call_args tbrk
+%type <ident> ident primary_typename array_typename struct_typename typename 
+%type <expr> numeric expr assign  
+%type <varvec> func_decl_args struct_members  
+%type <exprvec> call_args 
 %type <block> program stmts block trblk
-%type <stmt> stmt var_decl func_decl struct_decl if_stmt for_stmt while_stmt
+%type <stmt> stmt var_decl func_decl struct_decl if_stmt for_stmt while_stmt  input output
 %type <token> comparison
 
 %left TPLUS TMINUS
@@ -58,12 +60,14 @@ stmt : var_decl TSEMICOLON | func_decl | struct_decl
 		 | if_stmt
 		 | for_stmt
 		 | while_stmt
+		 | input TSEMICOLON
+		 | output TSEMICOLON
 		 ;
 
 block : TLBRACE trblk { $$ = $2;}
 			;
 trblk : stmts TRBRACE { $$ = $1; }
-		 | TLBRACE TRBRACE { $$ = new rmmc::BlockStatement(); }
+		 |  TRBRACE { $$ = new rmmc::BlockStatement(); }
 primary_typename : TYINT { $$ = new rmmc::IdentifierExpr(*$1); $$->isType = true; }
 					| TYDOUBLE { $$ = new rmmc::IdentifierExpr(*$1); $$->isType = true;  }
 					| TYFLOAT { $$ = new rmmc::IdentifierExpr(*$1); $$->isType = true;  }
@@ -166,14 +170,17 @@ if_stmt : TIF expr block { $$ = new rmmc::IfStatement(std::shared_ptr<rmmc::Expr
 			$$ = new rmmc::IfStatement(std::shared_ptr<rmmc::Expression>($2), std::shared_ptr<rmmc::BlockStatement>($3), std::shared_ptr<rmmc::BlockStatement>(blk)); 
 		}
 
-for_stmt : TFOR TLPAREN stmt TSEMICOLON expr TSEMICOLON expr TRPAREN block { $$ = new rmmc::ForStatement(std::shared_ptr<rmmc::Statement>($3), std::shared_ptr<rmmc::Expression>($5), std::shared_ptr<rmmc::Expression>($7), std::shared_ptr<rmmc::BlockStatement>($9)); }
+for_stmt : TFOR TLPAREN stmt expr TSEMICOLON expr  TRPAREN block { $$ = new rmmc::ForStatement(std::shared_ptr<rmmc::Statement>($3), std::shared_ptr<rmmc::Expression>($4), std::shared_ptr<rmmc::Expression>($6), std::shared_ptr<rmmc::BlockStatement>($8)); }
 		
 while_stmt : TWHILE TLPAREN expr TRPAREN block { $$ = new rmmc::WhileStatement(std::shared_ptr<rmmc::Expression>($3), std::shared_ptr<rmmc::BlockStatement>($5)); }
 
 struct_decl : TSTRUCT ident TLBRACE struct_members TRBRACE {$$ = new rmmc::StructDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($2), std::shared_ptr<rmmc::VariableList>($4)); }
 
 struct_members : /* blank */ { $$ = new rmmc::VariableList(); }
-				| var_decl { $$ = new rmmc::VariableList(); $$->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>($<var_decl>1)); }
-				| struct_members var_decl { $1->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>($<var_decl>2)); }
+				| var_decl TSEMICOLON{ $$ = new rmmc::VariableList(); $$->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>($<var_decl>1)); }
+				| struct_members var_decl TSEMICOLON{ $1->push_back(std::shared_ptr<rmmc::VariableDeclarationStatement>($<var_decl>2)); }
+
+input : TSCANF TLPAREN  typename TCOMMA ident TRPAREN  { $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($3), std::shared_ptr<rmmc::IdentifierExpr>($5)); }
+output : TPRINTF TLPAREN  typename TCOMMA ident TRPAREN  { $$ = new rmmc::VariableDeclarationStatement(std::shared_ptr<rmmc::IdentifierExpr>($3), std::shared_ptr<rmmc::IdentifierExpr>($5)); }
 
 %%
