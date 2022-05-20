@@ -141,10 +141,22 @@ namespace rmmc
         std::unique_ptr<llvm::Module> theModule;
         rmmc::TypeSystem typeSystem;
 
+        FunctionPtr getPrintf = nullptr;
+
 
         CodeGenContext() : typeSystem(theContext),theBuilder(theContext)
         {
             theModule = std::make_unique<llvm::Module>("main", this->theContext);
+            const std::string name="printf";
+            getPrintf = theModule->getFunction(llvm::StringRef(name));
+            if(getPrintf==nullptr){
+                FunctionTypePtr func_type = llvm::FunctionType::get(
+                    llvm::Type::getInt32Ty(theContext),
+                    {llvm::Type::getInt8PtrTy(theContext)},
+                    true
+                );
+                getPrintf = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, name.c_str(), theModule.get());
+            }
         }
 
         void CodeGen(std::shared_ptr<ASTNode> root);
