@@ -33,8 +33,6 @@ static FILE* yyparse_file_ptr;
 "for"                   puts("TFOR"); return TOKEN(TFOR);
 "while"                 puts("TWHILE"); return TOKEN(TWHILE);
 "struct"                puts("TSTRUCT"); return TOKEN(TSTRUCT);
-"printf"                puts("TPRINTF"); return TPRINTF;
-"scanf"                 puts("TSCANF"); return TSCANF;
 "int"                   SAVE_TOKEN; puts("TYINT");  return TYINT;
 "double"                SAVE_TOKEN; puts("TYDOUBLE"); return TYDOUBLE;
 "float"                 SAVE_TOKEN; puts("TYFLOAT"); return TYFLOAT;

@@ -39,7 +39,7 @@
 %type <varvec> func_decl_args struct_members  
 %type <exprvec> call_args 
 %type <block> program stmts block trblk
-%type <stmt> stmt var_decl func_decl struct_decl if_stmt for_stmt while_stmt  input output
+%type <stmt> stmt var_decl func_decl struct_decl if_stmt for_stmt while_stmt  
 %type <token> comparison
 
 %left TPLUS TMINUS
