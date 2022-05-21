@@ -551,6 +551,7 @@ namespace rmmc
 
         virtual void print() override
         {
+            std::cout<<"[......]Generate Struct"<<std::endl;
         }
         virtual std::string toJSON() override;
         virtual llvm::Value *codeGen(CodeGenContext &context) override;

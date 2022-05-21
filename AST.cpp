@@ -101,6 +101,7 @@ llvm::Type *getLLVMType(std::shared_ptr<IdentifierExpr> type, rmmc::CodeGenConte
         }
         else if (!name.compare("double"))
         {
+            std::cout << "doubleTy" << std::endl;
             return context.typeSystem.doubleTy;
         }
         else if (!name.compare("void"))
@@ -117,7 +118,7 @@ llvm::Type *getLLVMType(std::shared_ptr<IdentifierExpr> type, rmmc::CodeGenConte
         }
         else
         {
-            StructTypePtr structType = context.theModule->getTypeByName("name");
+            StructTypePtr structType = context.theModule->getTypeByName(name);
             if (structType == nullptr)
             {
                 return LogErrorT("The type is illegal");
@@ -292,13 +293,38 @@ llvm::Value *rmmc::SingleOperatorExpr::codeGen(CodeGenContext &context)
     return nullptr;
 }
 
+llvm::Value *StructMember(std::shared_ptr<Expression> LHS, std::shared_ptr<Expression> RHS, CodeGenContext& context)
+{
+    ValuePtr lhs = LHS->codeGen(context);
+    auto structPtr = context.theBuilder.CreateLoad(lhs, "structPtr");
+    //structPtr->setAlignment(4);
+    RHS->print();
+    IdentifierExpr* RHS_tmp = dynamic_cast<IdentifierExpr*>(RHS.get());
+    assert(RHS_tmp!=nullptr);
+    assert( structPtr->getType()->isStructTy() );
+
+    std::vector<ValuePtr> idxList;
+    std::string structName = structPtr->getType()->getStructName().str();
+    int memberIdx = context.getStructMemberId(structName, RHS_tmp->getName());
+    idxList.push_back( ConstantInt::get(context.typeSystem.intTy, 0, false) );
+    idxList.push_back( ConstantInt::get(context.typeSystem.intTy, (uint64_t)memberIdx, false));
+
+    return context.theBuilder.CreateInBoundsGEP(lhs, idxList, "StructMemberPtr");
+}
+
 llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
 {
     this->print();
+    if( this->Type == BinaryOperator::STRUCT_REF ){
+        return StructMember(this->LHS, this->RHS, context);
+    }
     ValuePtr lhs = this->LHS->codeGen(context);
     ValuePtr rhs = this->RHS->codeGen(context);
     assert(lhs != nullptr);
     assert(rhs != nullptr);
+
+    
+
     lhs = getActualValue(lhs, context);
     rhs = getActualValue(rhs, context);
 
@@ -569,13 +595,17 @@ llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context
     else
     {
         TypePtr type = getLLVMType(this->VariableType, context);
+        std::cout << "Variable Declaration Finished" << std::endl;
+        std::cout<<type->getTypeID()<<std::endl;
         ValuePtr alloca = context.theBuilder.CreateAlloca(type);
+        std::cout << "Variable Declaration Finished" << std::endl;
         context.setSymbolTable(this->VariableName->getName(), alloca);
         context.setSymbolType(this->VariableName->getName(), type);
         if (this->hasAssignmentExpr() == true)
         {
             std::make_shared<AssignmentExpression>(this->VariableName, this->assignmentExpr->at(0))->codeGen(context);
         }
+        std::cout<<"Variable Declaration Finished"<<std::endl;
         return alloca;
     }
     return nullptr;
@@ -610,16 +640,25 @@ llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context
 
 llvm::Value *rmmc::StructDeclarationStatement::codeGen(CodeGenContext &context)
 {
+    this->print();
     StructTypePtr structType = context.theModule->getTypeByName(this->Name->getName());
     if (structType)
     {
         return LogErrorV("The struct already exists");
     }
     structType = llvm::StructType::create(context.theContext, this->Name->getName());
+
+    context.addStruct(this->Name->getName());
     std::vector<TypePtr> memberType;
+    int memeberIdx=0;
     for (auto &perMember : *this->Members)
     {
-        memberType.push_back(perMember->codeGen(context)->getType());
+        // perMember->codeGen(context);
+        // std::cout<<"x finished"<<std::endl;
+        memberType.push_back( getLLVMType(perMember->VariableType, context) );
+        context.addStructMember(this->Name->getName(), perMember->VariableName->getName(), memeberIdx);
+        memeberIdx++;
+        // std::cout << "x finished" << std::endl;
     }
     structType->setBody(llvm::ArrayRef(memberType));
     return nullptr;

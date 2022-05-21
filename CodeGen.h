@@ -142,6 +142,8 @@ namespace rmmc
         std::unique_ptr<llvm::Module> theModule;
         rmmc::TypeSystem typeSystem;
 
+        std::map<std::string, std::map<std::string, int> > structMembers;
+
         FunctionPtr getPrintf = nullptr;
 
 
@@ -239,6 +241,32 @@ namespace rmmc
                 }
             }
             return nullptr;
+        }
+
+        void addStruct(std::string structName)
+        {
+            this->structMembers[structName]=std::map<std::string, int>();
+        }
+
+        void addStructMember(std::string structName, std::string name, int idx)
+        {
+            if(this->structMembers.find(structName)==this->structMembers.end()){
+                std::cout<<"[ERROR] : The struct doesn't exist"<<std::endl;
+            }else{
+                structMembers[structName][name]=idx;
+            }
+        }
+
+        int getStructMemberId(std::string structName, std::string name)
+        {
+            if(this->structMembers.find(structName)==this->structMembers.end()){
+                std::cout<<"[ERROR] : The struct doesn't exist"<<std::endl;
+            }else if(this->structMembers[structName].find(name)==this->structMembers[structName].end()){
+                std::cout << "[ERROR] : The struct memeber doesn't exist" << std::endl;
+            }else{
+                return this->structMembers[structName][name];
+            }
+            return -1;
         }
     };
 }
