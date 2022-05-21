@@ -58,9 +58,13 @@ std::string IdentifierExpr::toJSON()
 {
 	//std::to_string()
 	std::vector<std::string> children;
-	children.push_back(to_json(Name));
-	children.push_back(to_json("isType",std::to_string(isType)));
-	children.push_back(to_json("isArray",std::to_string(isArray)));
+	children.push_back(to_json("Name",to_json(Name)));
+	if(isType==true)
+	children.push_back(to_json("isType",to_json("True")));
+	else children.push_back(to_json("isType",to_json("False")));
+	if(isArray==true)
+	children.push_back(to_json("isArray",to_json("True")));
+	else children.push_back(to_json("isArray",to_json("False")));
 	std::vector<std::string> Arry_content ;
 	int i=0;
     for (auto& Arry : *arraySize) {
@@ -135,51 +139,51 @@ std::string BinaryOperatorExpr::toJSON()
 	std::string opname;
 	switch(Type){
 		case BinaryOperator::SCOPE:
-			opname = "::";
+			opname = "::";break;
 		case BinaryOperator::ARRAY_INDEX:
-			opname = "[]";
+			opname = "[]";break;
 		case BinaryOperator::STRUCT_REF:
-			opname = ".";
+			opname = ".";break;
 		case BinaryOperator::STRUCT_DEREF:
-			opname = "&gt";
+			opname = "&gt";break;
 		case BinaryOperator::AS:
-			opname = "as";
+			opname = "as";break;
 		case BinaryOperator::ADD:
-			opname = "+";
+			opname = "+";break;
 		case BinaryOperator::SUB:
-			opname = "-";
+			opname = "-";break;
 		case BinaryOperator::MUL:
-			opname = "*";
+			opname = "*";break;
 		case BinaryOperator::DIV:
-			opname = "/";
+			opname = "/";break;
 		case BinaryOperator::MOD:
-			opname = "%";
+			opname = "%";break;
 		case BinaryOperator::LEFT_SHIFT:
-			opname = "&lt&lt";
+			opname = "&lt&lt";break;
 		case BinaryOperator::RIGHT_SHIFT:
-			opname = "&gt&gt";
+			opname = "&gt&gt";break;
 		case BinaryOperator::LT:
-			opname = "&lt";
+			opname = "&lt";break;
 		case BinaryOperator::ELT:
-			opname = "&lt=";
+			opname = "&lt=";break;
 		case BinaryOperator::GT:
-			opname = "&gt";
+			opname = "&gt";break;
 		case BinaryOperator::EGT:
-			opname = "&gt=";
+			opname = "&gt=";break;
 		case BinaryOperator::E:
-			opname = "==";
+			opname = "==";break;
 		case BinaryOperator::NE:
-			opname = "!=";
+			opname = "!=";break;
 		case BinaryOperator::AND:
-			opname = "&amp";
+			opname = "&amp";break;
 		case BinaryOperator::XOR:
-			opname = "^";
+			opname = "^";break;
 		case BinaryOperator::OR:
-			opname = "|";
+			opname = "|";break;
 		case BinaryOperator::LOGICAL_AND:
-			opname = "&amp&amp";
+			opname = "&amp&amp";break;
 		case BinaryOperator::LOGICAL_OR:
-			opname = "||";
+			opname = "||";break;
 	};
 	children.push_back(LHS->toJSON());
 	children.push_back(to_json("op",to_json(opname)));
