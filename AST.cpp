@@ -212,7 +212,20 @@ llvm::Value *rmmc::ArrayIndex::codeGen(CodeGenContext &context)
     for (auto &perIdx : *this->index)
     {
         ValuePtr val = getActualValue(perIdx->codeGen(context), context);
-        
+        if( val->getType()->getTypeID() != llvm::Type::IntegerTyID ){
+            return LogErrorV("The index is illegal");
+        }
+        val_idx = context.theBuilder.CreateAdd(val_idx, val, "indexAdd");
+        val_idx = getActualValue(val_idx, context);
+
+        if(i<arraySize->size()){
+            val_idx = context.theBuilder.CreateMul(
+                val_idx,
+                (new IntegerExpr(arraySize->at(i)))->codeGen(context),
+                "indexAdd");
+            val_idx = getActualValue(val_idx, context);
+            i++;
+        }
         // llvm::ConstantInt* tmp = llvm::dyn_cast<ConstantInt>(
         //     val);
         // std::cout<<val->getType()->getTypeID()<<std::endl;
@@ -228,7 +241,8 @@ llvm::Value *rmmc::ArrayIndex::codeGen(CodeGenContext &context)
         //     i++;
         // }
     }
-    Idxs.push_back( (new IntegerExpr(idx))->codeGen(context) );
+    //Idxs.push_back( (new IntegerExpr(idx))->codeGen(context) );
+    Idxs.push_back(val_idx);
     ValuePtr array_i = context.theBuilder.CreateGEP(type, array, llvm::ArrayRef(Idxs));
     if (array_i == nullptr)
     {
@@ -375,8 +389,8 @@ llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
     else
     {
         std::cout << lhs->getType()->getTypeID() << " " << rhs->getType()->getTypeID() << std::endl;
-        lhs = context.typeSystem.cast(lhs, context.typeSystem.doubleTy, context.currentBlock());
-        rhs = context.typeSystem.cast(rhs, context.typeSystem.doubleTy, context.currentBlock());
+        lhs = context.typeSystem.cast(lhs, context.typeSystem.doubleTy, context.currentBlock(), context);
+        rhs = context.typeSystem.cast(rhs, context.typeSystem.doubleTy, context.currentBlock(), context);
         std::cout << lhs->getType()->getTypeID() << " " << rhs->getType()->getTypeID() << std::endl;
         if (lhs== nullptr || rhs == nullptr)
         {
@@ -468,7 +482,7 @@ llvm::Value *rmmc::AssignmentExpression::codeGen(CodeGenContext &context)
     ValuePtr r = this->RHS->codeGen(context);
 
     std::cout << l->getType()->getTypeID() << " " << r->getType()->getTypeID() << std::endl;
-    r = context.typeSystem.cast(r, lType, context.currentBlock());
+    r = context.typeSystem.cast(r, lType, context.currentBlock(), context);
 
     if (r == nullptr)
     {
@@ -697,6 +711,27 @@ llvm::Value *rmmc::TypedefStatement::codeGen(CodeGenContext &context)
     return nullptr;
 }
 
+llvm::Value* CastToBool(ValuePtr val, CodeGenContext& context)
+{
+    TypePtr from = val->getType();
+    TypePtr type = context.typeSystem.doubleTy;
+    if(from != type){
+        std::cout<<"[TYPE CAST] : "<<from->getTypeID()<<" "<<type->getTypeID()<<std::endl;
+        if(context.typeSystem._castTable.find(from)==context.typeSystem._castTable.end()){
+            return LogErrorV("No Cast");
+        }
+        else if (context.typeSystem._castTable[from].find(type) == context.typeSystem._castTable[from].end())
+        {
+            return LogErrorV("No Cast");
+        }else{
+            val=context.theBuilder.CreateCast(context.typeSystem._castTable[from][type], val, type, "cast");
+        }
+    }
+    val = context.theBuilder.CreateFCmpONE(
+        val, ConstantFP::get(context.theContext, APFloat(0.0)), "cond");
+    return val;
+}
+
 llvm::Value *rmmc::IfStatement::codeGen(CodeGenContext &context)
 {
     ValuePtr condValue = this->Condition->codeGen(context);
@@ -708,9 +743,7 @@ llvm::Value *rmmc::IfStatement::codeGen(CodeGenContext &context)
     FunctionPtr theFunction = context.theBuilder.GetInsertBlock()->getParent();
 
     condValue = getActualValue(condValue, context);
-    condValue = context.typeSystem.cast(condValue, context.typeSystem.doubleTy, context.currentBlock());
-    condValue = context.theBuilder.CreateFCmpONE(
-        condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "ifcond");
+    condValue = CastToBool(condValue, context);
 
     BasicBlockPtr ThenBB = llvm::BasicBlock::Create(context.theContext, "then", theFunction);
     BasicBlockPtr ElseBB = llvm::BasicBlock::Create(context.theContext, "else");
@@ -745,15 +778,9 @@ llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
 {
     this->print();
     FunctionPtr theFunction = context.theBuilder.GetInsertBlock()->getParent();
-    BasicBlockPtr LoopEntryBB = llvm::BasicBlock::Create(context.theContext, "loop_entry", theFunction);
-    BasicBlockPtr LoopBB = llvm::BasicBlock::Create(context.theContext, "loop");
+    BasicBlockPtr LoopBB = llvm::BasicBlock::Create(context.theContext, "loop", theFunction);
     BasicBlockPtr LoopAfterBB = llvm::BasicBlock::Create(context.theContext, "loop_after");
 
-    context.theBuilder.CreateBr(LoopEntryBB);
-
-    context.pushBlock(LoopEntryBB);
-    context.theBuilder.SetInsertPoint(LoopEntryBB);
-    // LoopEntryBlock content
     if (this->initial)
         this->initial->codeGen(context);
     // std::cout<<"Initial Finished"<<std::endl;
@@ -763,44 +790,97 @@ llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
     }
     ValuePtr condValue = this->condition->codeGen(context);
     condValue = getActualValue(condValue, context);
-    // std::cout << "Finished"<<std::endl;
-    // condValue = getActualValue(condValue, context);
-    // std::cout << "Condition Start" << std::endl;
-    // std::cout << (llvm::ConstantFP::get(context.theContext, APFloat(0.0)) )->getType()<<std::endl;
-    std::cout << condValue->getType()->getTypeID() << std::endl; 
-    condValue = context.typeSystem.cast(condValue, context.typeSystem.doubleTy, context.currentBlock());
-    condValue = context.theBuilder.CreateFCmpONE(
-        llvm::ConstantFP::get(context.theContext, APFloat(0.0)), condValue,"loop_cond");
+    condValue = CastToBool(condValue, context);
     std::cout << "Condition Finished" << std::endl;
     if (condValue == nullptr)
     {
         return LogErrorV("The jump condition is illegal");
     }
+
     context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
 
-    theFunction->getBasicBlockList().push_back(LoopBB);
     context.theBuilder.SetInsertPoint(LoopBB);
     context.pushBlock(LoopBB);
     this->content->codeGen(context);
+    context.popBlock();
+
     if (this->increment != nullptr)
     {
         this->increment->codeGen(context);
     }
+    //context.theBuilder.SetInsertPoint(LoopBB);
     condValue = this->condition->codeGen(context);
     condValue = getActualValue(condValue, context);
-    condValue = context.typeSystem.cast(condValue, context.typeSystem.doubleTy, context.currentBlock());
-    condValue = context.theBuilder.CreateFCmpONE(
-        condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
-    context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
-    context.popBlock();
 
+    condValue = CastToBool(condValue, context);
+
+    context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
+    
     theFunction->getBasicBlockList().push_back(LoopAfterBB);
     context.theBuilder.SetInsertPoint(LoopAfterBB);
-    // pop loop entry block
-    context.popBlock();
 
     return nullptr;
 }
+// llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
+// {
+//     this->print();
+//     FunctionPtr theFunction = context.theBuilder.GetInsertBlock()->getParent();
+//     BasicBlockPtr LoopEntryBB = llvm::BasicBlock::Create(context.theContext, "loop_entry", theFunction);
+//     BasicBlockPtr LoopBB = llvm::BasicBlock::Create(context.theContext, "loop");
+//     BasicBlockPtr LoopAfterBB = llvm::BasicBlock::Create(context.theContext, "loop_after");
+
+//     context.theBuilder.CreateBr(LoopEntryBB);
+
+//     context.pushBlock(LoopEntryBB);
+//     context.theBuilder.SetInsertPoint(LoopEntryBB);
+//     // LoopEntryBlock content
+//     if (this->initial)
+//         this->initial->codeGen(context);
+//     // std::cout<<"Initial Finished"<<std::endl;
+//     if (this->condition == nullptr)
+//     {
+//         return LogErrorV("The forStatement doesn't have jump condition");
+//     }
+//     ValuePtr condValue = this->condition->codeGen(context);
+//     condValue = getActualValue(condValue, context);
+//     // std::cout << "Finished"<<std::endl;
+//     // condValue = getActualValue(condValue, context);
+//     // std::cout << "Condition Start" << std::endl;
+//     // std::cout << (llvm::ConstantFP::get(context.theContext, APFloat(0.0)) )->getType()<<std::endl;
+//     std::cout << condValue->getType()->getTypeID() << std::endl; 
+//     condValue = context.typeSystem.cast(condValue, context.typeSystem.doubleTy, context.currentBlock());
+//     condValue = context.theBuilder.CreateFCmpONE(
+//         llvm::ConstantFP::get(context.theContext, APFloat(0.0)), condValue,"loop_cond");
+//     std::cout << "Condition Finished" << std::endl;
+//     if (condValue == nullptr)
+//     {
+//         return LogErrorV("The jump condition is illegal");
+//     }
+//     context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
+
+//     theFunction->getBasicBlockList().push_back(LoopBB);
+//     context.theBuilder.SetInsertPoint(LoopBB);
+//     context.pushBlock(LoopBB);
+//     this->content->codeGen(context);
+//     if (this->increment != nullptr)
+//     {
+//         this->increment->codeGen(context);
+//     }
+//     condValue = this->condition->codeGen(context);
+//     condValue = getActualValue(condValue, context);
+//     condValue = context.typeSystem.cast(condValue, context.typeSystem.doubleTy, context.currentBlock());
+//     condValue = context.theBuilder.CreateFCmpONE(
+//         condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
+//     context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
+//     context.popBlock();
+
+//     theFunction->getBasicBlockList().push_back(LoopAfterBB);
+//     context.theBuilder.SetInsertPoint(LoopAfterBB);
+//     // pop loop entry block
+//     context.popBlock();
+
+//     return nullptr;
+// }
 
 llvm::Value *rmmc::WhileStatement::codeGen(CodeGenContext &context)
 {
@@ -823,11 +903,12 @@ llvm::Value *rmmc::WhileStatement::codeGen(CodeGenContext &context)
     {
         this->Block->codeGen(context);
     }
+    context.popBlock();
     condValue = this->Condition->codeGen(context);
     condValue = context.theBuilder.CreateFCmpONE(
         condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
     context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
-    context.popBlock();
+    
 
     theFunction->getBasicBlockList().push_back(LoopAfterBB);
     context.theBuilder.SetInsertPoint(LoopAfterBB);

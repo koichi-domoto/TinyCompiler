@@ -44,6 +44,7 @@ namespace rmmc
     class TypeSystem
     {
     public:
+        llvm::LLVMContext& _context;
         std::map<TypePtr, std::map<TypePtr, llvm::CastInst::CastOps>> _castTable;
         TypePtr floatTy = nullptr;
         TypePtr intTy = nullptr;
@@ -53,7 +54,7 @@ namespace rmmc
         TypePtr voidTy = nullptr;
         TypePtr boolTy = nullptr;
 
-        TypeSystem(llvm::LLVMContext& llvmContext)
+        TypeSystem(llvm::LLVMContext& llvmContext) : _context(llvmContext)
         {
             floatTy = llvm::Type::getFloatTy(llvmContext);
             intTy = llvm::Type::getInt32Ty(llvmContext);
@@ -78,7 +79,7 @@ namespace rmmc
             }
             _castTable[from][to] = op;
         }
-        ValuePtr cast(ValuePtr value, TypePtr type, BasicBlockPtr block)
+        ValuePtr cast(ValuePtr value, TypePtr type, BasicBlockPtr block, CodeGenContext& context)
         {
             TypePtr from = value->getType();
             if (from == type)
@@ -93,6 +94,7 @@ namespace rmmc
                 std::cout << "No cast" << std::endl;
                 return nullptr;
             }
+//            return context.theBuilder.CreateCast(_castTable[from][type], value, type, "cast");
             return llvm::CastInst::Create(_castTable[from][type], value, type, "cast", block);
         }
         // ValuePtr CastToBool(CodeGenContext& context, ValuePtr value)
