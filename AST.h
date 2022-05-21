@@ -139,9 +139,12 @@ namespace rmmc
 
     public:
         StringExpr(char* _value) : Value(_value){
+            std::string tmp = std::string(_value);
+            Value = tmp.substr(1, tmp.length()-2);
         }
         StringExpr(std::string _value) : Value(_value)
         {
+            Value = _value.substr(1, _value.length()-2);
         }
         virtual ~StringExpr() {}
 

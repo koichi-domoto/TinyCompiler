@@ -1,0 +1,6 @@
+int main()
+{
+	int[2] a =[3,4];
+	printf("sum=%d",a[0]);
+	return 0;
+}

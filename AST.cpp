@@ -65,12 +65,21 @@ llvm::Type *LogErrorT(std::string Str)
     return nullptr;
 }
 
+llvm::Value *getActualValue(ValuePtr value, CodeGenContext& context)
+{
+    if( llvm::isa<llvm::Constant>(value) ){
+        return value;
+    }else{
+        return context.theBuilder.CreateLoad(value);
+    }
+}
+
 llvm::Type *getLLVMType(std::shared_ptr<IdentifierExpr> type, rmmc::CodeGenContext &context)
 {
     assert(type->isType == true);
     std::string name = type->getName();
     std::cout << "getLLVMType: " << name << std::endl;
-    if (type->isArray == false)
+    if (true)
     {
         if (!name.compare("bool"))
         {
@@ -116,7 +125,46 @@ llvm::Type *getLLVMType(std::shared_ptr<IdentifierExpr> type, rmmc::CodeGenConte
     }
     else
     {
-        return nullptr;
+        if (!name.compare("bool"))
+        {
+            return llvm::Type::getInt1PtrTy(context.theContext);
+        }
+        else if (!name.compare("int"))
+        {
+            return llvm::Type::getInt32PtrTy(context.theContext);
+        }
+        else if (!name.compare("float"))
+        {
+            return llvm::Type::getFloatPtrTy(context.theContext);
+        }
+        else if (!name.compare("double"))
+        {
+            return llvm::Type::getDoublePtrTy(context.theContext);
+        }
+        else if (!name.compare("void"))
+        {
+            return llvm::Type::getInt64PtrTy(context.theContext);
+        }
+        else if (!name.compare("string"))
+        {
+            return llvm::Type::getInt8PtrTy(context.theContext);
+        }
+        else if (!name.compare("char"))
+        {
+            return llvm::Type::getInt8PtrTy(context.theContext);
+        }
+        else
+        {
+            StructTypePtr structType = context.theModule->getTypeByName("name");
+            if (structType == nullptr)
+            {
+                return LogErrorT("The type is illegal");
+            }
+            else
+            {
+                return structType;
+            }
+        }
     }
     return nullptr;
 }
@@ -133,24 +181,25 @@ llvm::Value *rmmc::ExpressionStatement::codeGen(CodeGenContext &context)
 llvm::Value *rmmc::ArrayIndex::codeGen(CodeGenContext &context)
 {
     this->print();
+    TypePtr type = context.getSymbolType(this->arrayName->getName());
     ValuePtr array = context.getSymbolTable(this->arrayName->getName());
     if (array == nullptr)
     {
         return LogErrorV("The array doesn't exist");
     }
-    ValuePtr con_0 = std::make_shared<rmmc::IntegerExpr>(0)->codeGen(context);
+    ValuePtr con_0 = ( new IntegerExpr(0) )->codeGen(context);
     std::vector<ValuePtr> Idxs;
     Idxs.push_back(con_0);
     for (auto &perIdx : *this->index)
     {
         Idxs.push_back(perIdx->codeGen(context));
     }
-    ValuePtr array_i = context.theBuilder.CreateInBoundsGEP(array, llvm::ArrayRef(Idxs));
+    ValuePtr array_i = context.theBuilder.CreateGEP(type, array, llvm::ArrayRef(Idxs));
     if (array_i == nullptr)
     {
         return LogErrorV("The array index is illegal");
     }
-    return context.theBuilder.CreateLoad(array_i);
+    return array_i;
 }
 
 llvm::Value *rmmc::DoubleExpr::codeGen(CodeGenContext &context)
@@ -328,7 +377,7 @@ llvm::Value *rmmc::FunctionCallExpr::codeGen(CodeGenContext &context)
             {
                 return LogErrorV("The function params is nullptr");
             }
-            if( dynamic_cast<rmmc::IdentifierExpr*>((*it).get()) !=nullptr ){
+            if( llvm::isa<llvm::Constant>(tmp) == false ){
                 tmp = context.theBuilder.CreateLoad(tmp);
             }
             callArgs.push_back(tmp);
@@ -342,20 +391,17 @@ llvm::Value *rmmc::AssignmentExpression::codeGen(CodeGenContext &context)
     this->print();
     ValuePtr l=nullptr;
     ValuePtr l_val=nullptr;
-    // if( dynamic_cast< IdentifierExpr* >(this->LHS.get()) != nullptr )
-    // {
-    // }
+    TypePtr lType=nullptr;
     l = this->LHS->codeGen(context);
     if (l == nullptr)
     {
         return LogErrorV("Assignment LHS is nullptr");
     }
     l_val = context.theBuilder.CreateLoad(l);
-    TypePtr lType = l_val->getType();
+    lType = l_val->getType();
 
     ValuePtr r = this->RHS->codeGen(context);
-    
-    
+
     std::cout << l->getType()->getTypeID() << " " << r->getType()->getTypeID() << std::endl;
     r = context.typeSystem.cast(r, lType, context.currentBlock());
     
@@ -407,7 +453,7 @@ llvm::Value *rmmc::FunctionDeclarationStatement::codeGen(CodeGenContext &context
     {
         perArg.setName((*it)->getName().getName());
         context.setSymbolTable((*it)->getName().getName(), &perArg);
-        context.setSymbolType((*it)->getName().getName(), (*it)->getType());
+        context.setSymbolType((*it)->getName().getName(), perArg.getType() );
         it++;
     }
     // Generate the code of function content
@@ -429,19 +475,52 @@ llvm::Value *rmmc::FunctionDeclarationStatement::codeGen(CodeGenContext &context
 llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context)
 {
     this->print();
+    assert(this->VariableName!=nullptr&&this->VariableType!=nullptr);
     assert(this->VariableType->isType == true);
     if (this->VariableType->isArray)
     {
         uint64_t arraySize = 1;
         for (auto it = this->VariableType->arraySize->begin(); it != this->VariableType->arraySize->end(); it++)
         {
-            IntegerExpr *perSize = dynamic_cast<IntegerExpr *>(it->get());
-            arraySize *= perSize->getValue();
+            llvm::ConstantInt* tmp=llvm::dyn_cast<ConstantInt>((*it)->codeGen(context));
+            //IntegerExpr *perSize = dynamic_cast<IntegerExpr *>(it->get());
+            //arraySize *= perSize->getValue();
+            if(tmp==nullptr){
+                return LogErrorV("The arraySize is illegal");
+            }
+            arraySize *= tmp->getSExtValue();
         }
+        std::cout<<"ArraySize="<<arraySize<<std::endl;
+    //    TypePtr type = getLLVMType(this->VariableType, context);
         ArrayTypePtr type = llvm::ArrayType::get(getLLVMType(this->VariableType, context), arraySize);
+        std::cout<<"ArrayType Finished"<<std::endl;
         ValuePtr alloca = context.theBuilder.CreateAlloca(type);
+        std::cout<<"Array Alloca Finished"<<std::endl;
         context.setSymbolTable(this->VariableName->getName(), alloca);
-        context.setSymbolType(this->VariableName->getName(), this->VariableType);
+        context.setSymbolType(this->VariableName->getName(), type);
+
+        if( this->hasAssignmentExpr()==true ){
+            if( arraySize!=this->assignmentExpr->size() ){
+                return LogErrorV("The array assignemnt size is different");
+            }
+            std::vector<ValuePtr> idxList;
+            int idx=0;
+            idxList.push_back((new IntegerExpr(0))->codeGen(context));
+            for(auto& it : *this->assignmentExpr)
+            {
+                ValuePtr r = it->codeGen(context);
+                ValuePtr r_val = getActualValue(r,context);
+                idxList.push_back( (new IntegerExpr(idx))->codeGen(context) );
+                context.theBuilder.CreateStore(
+                    r_val,
+                    context.theBuilder.CreateGEP(type, alloca, llvm::ArrayRef(idxList)));
+                idxList.pop_back();
+                idx++;
+                
+            }
+            std::cout<<"Array Declaration Finished"<<std::endl;
+        }
+        
         return alloca;
     }
     else
@@ -449,7 +528,10 @@ llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context
         TypePtr type = getLLVMType(this->VariableType, context);
         ValuePtr alloca = context.theBuilder.CreateAlloca(type);
         context.setSymbolTable(this->VariableName->getName(), alloca);
-        context.setSymbolType(this->VariableName->getName(), this->VariableType);
+        context.setSymbolType(this->VariableName->getName(), type);
+        if( this->hasAssignmentExpr() ==true ){
+            std::make_shared<AssignmentExpression>(this->VariableName, this->assignmentExpr->at(0))->codeGen(context);
+        }
         return alloca;
     }
     return nullptr;

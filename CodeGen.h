@@ -127,7 +127,7 @@ namespace rmmc
     public:
         BasicBlockPtr block;
         std::map<std::string, ValuePtr> SymbolTable;
-        std::map<std::string, std::shared_ptr<IdentifierExpr> > SymbolType;
+        std::map<std::string, TypePtr > SymbolType;
         ValuePtr returnValue;
     };
 
@@ -196,7 +196,7 @@ namespace rmmc
         {
             blockStack.back()->SymbolTable[name] = alloca;
         }
-        void setSymbolType(std::string name, std::shared_ptr<IdentifierExpr> type)
+        void setSymbolType(std::string name, TypePtr type)
         {
             blockStack.back()->SymbolType[name] = type;
         }
@@ -212,7 +212,7 @@ namespace rmmc
             }
             return nullptr;
         }
-        std::shared_ptr<IdentifierExpr> getSymbolType(std::string name){
+        TypePtr getSymbolType(std::string name){
             std::vector<CodeGenBlockPtr>::reverse_iterator it;
             for (it = this->blockStack.rbegin(); it != this->blockStack.rend(); it++)
             {

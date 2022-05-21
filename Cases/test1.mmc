@@ -1,7 +1,14 @@
+int add(int x,int y)
+{
+	return x+y;
+}
 int main()
 {
 	int a;
 	a=1;
-	printf("HelloWorld=%d",a);
+	int b;
+	b=2;
+	int c=add(a,b);
+	printf("a=%d, b=%d c=%d",a,b,c);
 	return 0;
 }

@@ -9,8 +9,8 @@
 
 <body>
     <script>
-        var width = 700;
-        var height = 700;
+        var width = 1500;
+        var height = 1500;
         //1选中页面设置的svg绘制区域的宽高 添加g元素 设置位置
         var svg = d3.select('body')
             .append('svg')
@@ -54,7 +54,7 @@
 
             // 4 给节点添加圆圈设置半径 
             node.append('circle')
-                .attr('r', 4.5)
+                .attr('r', 2)
                 .attr('stroke-width',1.5)
                 .attr('stroke','steelblue')
                 .attr('fill','steelblue')
