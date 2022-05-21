@@ -1,0 +1,17 @@
+int sum(int x)
+{
+	int r;
+	if(x<=0){
+		r=0;
+	}else{
+		r=x+sum(x-2);
+	}
+	return r;
+}
+int main()
+{
+	int res;
+	res=sum(8);
+	printf("res==%d",res);
+	return 0;
+}

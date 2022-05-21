@@ -24,3 +24,9 @@ clang++ output.o -o out
 ./out
 ```
 
+
+
+To-Do
+
+1. input
+2. 

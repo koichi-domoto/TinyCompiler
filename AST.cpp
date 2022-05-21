@@ -208,21 +208,25 @@ llvm::Value *rmmc::ArrayIndex::codeGen(CodeGenContext &context)
 
     int i = 1;
     int idx = 0;
+    ValuePtr val_idx = (new IntegerExpr(0))->codeGen(context);
     for (auto &perIdx : *this->index)
     {
-        llvm::ConstantInt* tmp = llvm::dyn_cast<ConstantInt>(
-            getActualValue(perIdx->codeGen(context), context) );
-        if (tmp == nullptr)
-        {
-            return LogErrorV("The index is illegal");
-        }
-        idx = idx+tmp->getSExtValue();
-        std::cout<<"get ArrayIndex"<<tmp->getSExtValue()<<std::endl;
-        if (i < arraySize->size())
-        {
-            idx=idx*arraySize->at(i);
-            i++;
-        }
+        ValuePtr val = getActualValue(perIdx->codeGen(context), context);
+        
+        // llvm::ConstantInt* tmp = llvm::dyn_cast<ConstantInt>(
+        //     val);
+        // std::cout<<val->getType()->getTypeID()<<std::endl;
+        // if (tmp == nullptr)
+        // {
+        //     return LogErrorV("The index is illegal");
+        // }
+        // idx = idx+tmp->getSExtValue();
+        // std::cout<<"get ArrayIndex"<<tmp->getSExtValue()<<std::endl;
+        // if (i < arraySize->size())
+        // {
+        //     idx=idx*arraySize->at(i);
+        //     i++;
+        // }
     }
     Idxs.push_back( (new IntegerExpr(idx))->codeGen(context) );
     ValuePtr array_i = context.theBuilder.CreateGEP(type, array, llvm::ArrayRef(Idxs));
@@ -436,13 +440,10 @@ llvm::Value *rmmc::FunctionCallExpr::codeGen(CodeGenContext &context)
         for (it = this->Args->begin(); it != this->Args->end(); it++)
         {
             ValuePtr tmp = (*it)->codeGen(context);
+            tmp = getActualValue(tmp, context);
             if (tmp == nullptr)
             {
                 return LogErrorV("The function params is nullptr");
-            }
-            if (llvm::isa<llvm::Constant>(tmp) == false)
-            {
-                tmp = context.theBuilder.CreateLoad(tmp);
             }
             callArgs.push_back(tmp);
         }
@@ -686,7 +687,7 @@ llvm::Value *rmmc::ReturnStatement::codeGen(CodeGenContext &context)
     {
         return LogErrorV("return value nullptr");
     }
-    context.theBuilder.CreateRet(returnVal);
+    context.theBuilder.CreateRet(getActualValue(returnVal, context));
     //    context.setCurrentReturnValue(returnVal);
     return returnVal;
 }
@@ -706,6 +707,8 @@ llvm::Value *rmmc::IfStatement::codeGen(CodeGenContext &context)
 
     FunctionPtr theFunction = context.theBuilder.GetInsertBlock()->getParent();
 
+    condValue = getActualValue(condValue, context);
+    condValue = context.typeSystem.cast(condValue, context.typeSystem.doubleTy, context.currentBlock());
     condValue = context.theBuilder.CreateFCmpONE(
         condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "ifcond");
 
