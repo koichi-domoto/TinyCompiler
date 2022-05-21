@@ -6,5 +6,6 @@ int main()
 {
 	struct Point p;
 	p.x=2;
+	printf("%d",p.x);
 	return 0;
 }
