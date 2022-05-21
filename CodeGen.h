@@ -128,6 +128,7 @@ namespace rmmc
         BasicBlockPtr block;
         std::map<std::string, ValuePtr> SymbolTable;
         std::map<std::string, TypePtr > SymbolType;
+        std::map<std::string, std::vector<int>* > SymbolSize;
         ValuePtr returnValue;
     };
 
@@ -219,6 +220,22 @@ namespace rmmc
                 if ((*it)->SymbolType.find(name) != (*it)->SymbolType.end())
                 {
                     return (*it)->SymbolType[name];
+                }
+            }
+            return nullptr;
+        }
+        void setSymbolSize(std::string name, std::vector<int>* size)
+        {
+            blockStack.back()->SymbolSize[name]=size;
+        }
+        std::vector<int>* getSymbolSize(std::string name)
+        {
+            std::vector<CodeGenBlockPtr>::reverse_iterator it;
+            for (it = this->blockStack.rbegin(); it != this->blockStack.rend(); it++)
+            {
+                if ((*it)->SymbolSize.find(name) != (*it)->SymbolSize.end())
+                {
+                    return (*it)->SymbolSize[name];
                 }
             }
             return nullptr;

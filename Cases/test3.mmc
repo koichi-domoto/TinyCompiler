@@ -1,0 +1,9 @@
+int main()
+{
+	int i=1;
+	int j=2;
+	i=i+1;
+	i=i+j;
+	printf("i==%d",i);
+	return 0;
+}

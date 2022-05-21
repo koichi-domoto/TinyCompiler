@@ -65,11 +65,14 @@ llvm::Type *LogErrorT(std::string Str)
     return nullptr;
 }
 
-llvm::Value *getActualValue(ValuePtr value, CodeGenContext& context)
+llvm::Value *getActualValue(ValuePtr value, CodeGenContext &context)
 {
-    if( llvm::isa<llvm::Constant>(value) ){
+    if (llvm::isa<llvm::Constant>(value))
+    {
         return value;
-    }else{
+    }
+    else
+    {
         return context.theBuilder.CreateLoad(value);
     }
 }
@@ -87,7 +90,7 @@ llvm::Type *getLLVMType(std::shared_ptr<IdentifierExpr> type, rmmc::CodeGenConte
         }
         else if (!name.compare("int"))
         {
-            std::cout<<"intTy"<<std::endl;
+            std::cout << "intTy" << std::endl;
             return context.typeSystem.intTy;
         }
         else if (!name.compare("float"))
@@ -177,23 +180,48 @@ llvm::Value *rmmc::ExpressionStatement::codeGen(CodeGenContext &context)
     }
     return this->expr->codeGen(context);
 }
-
+/*
+[2][4][3]
+[ [ [ [],[] ], [ [],[] ] ]  , [ [ [],[] ], [ [],[] ] ] ]
+[1][1][1]
+((0+1)*4+1)*3+1=16
+[1][2][1]
+((0+1)*4+2)*3+1=19
+*/
 llvm::Value *rmmc::ArrayIndex::codeGen(CodeGenContext &context)
 {
     this->print();
     TypePtr type = context.getSymbolType(this->arrayName->getName());
     ValuePtr array = context.getSymbolTable(this->arrayName->getName());
+    std::vector<int> *arraySize = context.getSymbolSize(this->arrayName->getName());
     if (array == nullptr)
     {
         return LogErrorV("The array doesn't exist");
     }
-    ValuePtr con_0 = ( new IntegerExpr(0) )->codeGen(context);
+    assert(this->index->size() == arraySize->size());
+    ValuePtr con_0 = (new IntegerExpr(0))->codeGen(context);
     std::vector<ValuePtr> Idxs;
     Idxs.push_back(con_0);
+
+    int i = 1;
+    int idx = 0;
     for (auto &perIdx : *this->index)
     {
-        Idxs.push_back(perIdx->codeGen(context));
+        llvm::ConstantInt* tmp = llvm::dyn_cast<ConstantInt>(
+            getActualValue(perIdx->codeGen(context), context) );
+        if (tmp == nullptr)
+        {
+            return LogErrorV("The index is illegal");
+        }
+        idx = idx+tmp->getSExtValue();
+        std::cout<<"get ArrayIndex"<<tmp->getSExtValue()<<std::endl;
+        if (i < arraySize->size())
+        {
+            idx=idx*arraySize->at(i);
+            i++;
+        }
     }
+    Idxs.push_back( (new IntegerExpr(idx))->codeGen(context) );
     ValuePtr array_i = context.theBuilder.CreateGEP(type, array, llvm::ArrayRef(Idxs));
     if (array_i == nullptr)
     {
@@ -223,7 +251,7 @@ llvm::Value *rmmc::BooleanExpr::codeGen(CodeGenContext &context)
 llvm::Value *rmmc::StringExpr::codeGen(CodeGenContext &context)
 {
     return context.theBuilder.CreateGlobalString(this->Value, "string");
-    //return llvm::ConstantDataArray::getString(context.theContext, llvm::StringRef(this->Value), true);
+    // return llvm::ConstantDataArray::getString(context.theContext, llvm::StringRef(this->Value), true);
 }
 
 llvm::Value *rmmc::IdentifierExpr::codeGen(CodeGenContext &context)
@@ -269,8 +297,8 @@ llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
     ValuePtr rhs = this->RHS->codeGen(context);
     assert(lhs != nullptr);
     assert(rhs != nullptr);
-    TypePtr lType = lhs->getType();
-    TypePtr rType = rhs->getType();
+    lhs = getActualValue(lhs, context);
+    rhs = getActualValue(rhs, context);
 
     bool allInt = ((lhs->getType()->getTypeID() == llvm::Type::IntegerTyID) && (rhs->getType()->getTypeID() == llvm::Type::IntegerTyID));
 
@@ -377,7 +405,8 @@ llvm::Value *rmmc::FunctionCallExpr::codeGen(CodeGenContext &context)
             {
                 return LogErrorV("The function params is nullptr");
             }
-            if( llvm::isa<llvm::Constant>(tmp) == false ){
+            if (llvm::isa<llvm::Constant>(tmp) == false)
+            {
                 tmp = context.theBuilder.CreateLoad(tmp);
             }
             callArgs.push_back(tmp);
@@ -389,9 +418,9 @@ llvm::Value *rmmc::FunctionCallExpr::codeGen(CodeGenContext &context)
 llvm::Value *rmmc::AssignmentExpression::codeGen(CodeGenContext &context)
 {
     this->print();
-    ValuePtr l=nullptr;
-    ValuePtr l_val=nullptr;
-    TypePtr lType=nullptr;
+    ValuePtr l = nullptr;
+    ValuePtr l_val = nullptr;
+    TypePtr lType = nullptr;
     l = this->LHS->codeGen(context);
     if (l == nullptr)
     {
@@ -404,14 +433,14 @@ llvm::Value *rmmc::AssignmentExpression::codeGen(CodeGenContext &context)
 
     std::cout << l->getType()->getTypeID() << " " << r->getType()->getTypeID() << std::endl;
     r = context.typeSystem.cast(r, lType, context.currentBlock());
-    
+
     if (r == nullptr)
     {
         std::cout << l->getType() << " " << r->getType() << std::endl;
         return LogErrorV("l  and r type different");
     }
-    //ValuePtr r_val = context.theBuilder.CreateLoad(r);
-    //std::cout<< l->getValueName() <<std::endl;
+    // ValuePtr r_val = context.theBuilder.CreateLoad(r);
+    // std::cout<< l->getValueName() <<std::endl;
     context.theBuilder.CreateStore(r, l);
     return l;
 }
@@ -424,7 +453,7 @@ llvm::Value *rmmc::FunctionDeclarationStatement::codeGen(CodeGenContext &context
     VariableList::iterator it;
     for (auto &perArg : *Args)
     {
-        std::cout<<"process args....."<<std::endl;
+        std::cout << "process args....." << std::endl;
         funcArgs.push_back(getLLVMType(perArg->getType(), context));
     }
     std::cout << "Args finished" << std::endl;
@@ -435,7 +464,7 @@ llvm::Value *rmmc::FunctionDeclarationStatement::codeGen(CodeGenContext &context
         return LogErrorV("Return type is nullptr");
     }
     std::cout << "Return Type Finished" << std::endl;
-    std::cout << retType->getTypeID() <<std::endl;
+    std::cout << retType->getTypeID() << std::endl;
     // get function type and construct function
     FunctionTypePtr funcType = llvm::FunctionType::get(retType, llvm::ArrayRef(funcArgs), false);
     std::cout << "Func Type Finished" << std::endl;
@@ -453,7 +482,7 @@ llvm::Value *rmmc::FunctionDeclarationStatement::codeGen(CodeGenContext &context
     {
         perArg.setName((*it)->getName().getName());
         context.setSymbolTable((*it)->getName().getName(), &perArg);
-        context.setSymbolType((*it)->getName().getName(), perArg.getType() );
+        context.setSymbolType((*it)->getName().getName(), perArg.getType());
         it++;
     }
     // Generate the code of function content
@@ -475,52 +504,57 @@ llvm::Value *rmmc::FunctionDeclarationStatement::codeGen(CodeGenContext &context
 llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context)
 {
     this->print();
-    assert(this->VariableName!=nullptr&&this->VariableType!=nullptr);
+    assert(this->VariableName != nullptr && this->VariableType != nullptr);
     assert(this->VariableType->isType == true);
     if (this->VariableType->isArray)
     {
+        std::vector<int> *symbolSize = new std::vector<int>();
         uint64_t arraySize = 1;
+        int64_t perSize;
         for (auto it = this->VariableType->arraySize->begin(); it != this->VariableType->arraySize->end(); it++)
         {
-            llvm::ConstantInt* tmp=llvm::dyn_cast<ConstantInt>((*it)->codeGen(context));
-            //IntegerExpr *perSize = dynamic_cast<IntegerExpr *>(it->get());
-            //arraySize *= perSize->getValue();
-            if(tmp==nullptr){
+            llvm::ConstantInt *tmp = llvm::dyn_cast<ConstantInt>((*it)->codeGen(context));
+            if (tmp == nullptr)
+            {
                 return LogErrorV("The arraySize is illegal");
             }
-            arraySize *= tmp->getSExtValue();
+            perSize = tmp->getSExtValue();
+            arraySize *= perSize;
+            std::cout << perSize << std::endl;
+            symbolSize->push_back(perSize);
         }
-        std::cout<<"ArraySize="<<arraySize<<std::endl;
-    //    TypePtr type = getLLVMType(this->VariableType, context);
+        std::cout << "ArraySize=" << arraySize << std::endl;
+        //    TypePtr type = getLLVMType(this->VariableType, context);
         ArrayTypePtr type = llvm::ArrayType::get(getLLVMType(this->VariableType, context), arraySize);
-        std::cout<<"ArrayType Finished"<<std::endl;
+        std::cout << "ArrayType Finished" << std::endl;
         ValuePtr alloca = context.theBuilder.CreateAlloca(type);
-        std::cout<<"Array Alloca Finished"<<std::endl;
+        std::cout << "Array Alloca Finished" << std::endl;
         context.setSymbolTable(this->VariableName->getName(), alloca);
         context.setSymbolType(this->VariableName->getName(), type);
-
-        if( this->hasAssignmentExpr()==true ){
-            if( arraySize!=this->assignmentExpr->size() ){
+        context.setSymbolSize(this->VariableName->getName(), symbolSize);
+        if (this->hasAssignmentExpr() == true)
+        {
+            if (arraySize != this->assignmentExpr->size())
+            {
                 return LogErrorV("The array assignemnt size is different");
             }
             std::vector<ValuePtr> idxList;
-            int idx=0;
+            int idx = 0;
             idxList.push_back((new IntegerExpr(0))->codeGen(context));
-            for(auto& it : *this->assignmentExpr)
+            for (auto &it : *this->assignmentExpr)
             {
                 ValuePtr r = it->codeGen(context);
-                ValuePtr r_val = getActualValue(r,context);
-                idxList.push_back( (new IntegerExpr(idx))->codeGen(context) );
+                ValuePtr r_val = getActualValue(r, context);
+                idxList.push_back((new IntegerExpr(idx))->codeGen(context));
                 context.theBuilder.CreateStore(
                     r_val,
                     context.theBuilder.CreateGEP(type, alloca, llvm::ArrayRef(idxList)));
                 idxList.pop_back();
                 idx++;
-                
             }
-            std::cout<<"Array Declaration Finished"<<std::endl;
+            std::cout << "Array Declaration Finished" << std::endl;
         }
-        
+
         return alloca;
     }
     else
@@ -529,7 +563,8 @@ llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context
         ValuePtr alloca = context.theBuilder.CreateAlloca(type);
         context.setSymbolTable(this->VariableName->getName(), alloca);
         context.setSymbolType(this->VariableName->getName(), type);
-        if( this->hasAssignmentExpr() ==true ){
+        if (this->hasAssignmentExpr() == true)
+        {
             std::make_shared<AssignmentExpression>(this->VariableName, this->assignmentExpr->at(0))->codeGen(context);
         }
         return alloca;
