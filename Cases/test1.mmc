@@ -1,14 +1,17 @@
-int add(int x,int y)
-{
-	return x+y;
-}
 int main()
 {
-	int a;
-	a=1;
-	int b;
-	b=2;
-	int c=add(a,b);
-	printf("a=%d, b=%d c=%d",a,b,c);
+	int x=2;
+	double y=2;
+	int[2] a = [1,2];
+	int[2][2] b =[2,3,4,5];
+	struct point
+	{
+		int x;
+		int y;
+	}
+	struct point p;
+	p.x=1;
+	p.y=2;
+	printf("x=%d,y=%lf,a[1]=%d,b[0][1]=%d,p.x=%d,p.y=%d   ",x,y,a[1],b[0][1],p.x,p.y);
 	return 0;
 }

@@ -1,17 +1,14 @@
-int sum(int x)
+int sum(int a, int b)
 {
-	int r;
-	if(x<=0){
-		r=0;
-	}else{
-		r=x+sum(x-2);
-	}
-	return r;
+	int z=a+b;
+	return z;
 }
+
 int main()
 {
-	int res;
-	res=sum(8);
-	printf("res==%d",res);
+	int x=4;
+	int y=3;
+	int k=sum(x,y);
+	printf("k=%d    ",k);
 	return 0;
 }

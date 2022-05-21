@@ -1,8 +1,10 @@
 int main()
 {
-	int[2] a =[3,4];
-	printf("sum=%d",a[0]);
-	int[2][3] b=[1,2,3,4,5,6];
-	printf("b=%d",b[1][0]);
+	int x=2;
+	double y=2;
+	y=x+y;
+	x=x*y;
+	printf("%lf  ",y);
+	printf("%d   ",x);
 	return 0;
 }
