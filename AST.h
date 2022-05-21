@@ -727,6 +727,7 @@ namespace rmmc
         virtual ~ForStatement() {}
         virtual void print() override
         {
+            std::cout<<"Generate For Statement"<<std::endl;
         }
         virtual std::string toJSON() override;
         virtual llvm::Value *codeGen(CodeGenContext &context) override;

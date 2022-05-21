@@ -71,9 +71,11 @@ llvm::Value *getActualValue(ValuePtr value, CodeGenContext &context)
     {
         return value;
     }
-    else
+    else if( value->getType()->getTypeID()==15 )
     {
         return context.theBuilder.CreateLoad(value);
+    }else{
+        return value;
     }
 }
 
@@ -302,8 +304,12 @@ llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
 
     bool allInt = ((lhs->getType()->getTypeID() == llvm::Type::IntegerTyID) && (rhs->getType()->getTypeID() == llvm::Type::IntegerTyID));
 
+    std::cout<<"allInt== "<<allInt<<std::endl;
+
     if (allInt == true)
     {
+        // std::cout << lhs->getType()->getTypeID() << " " << rhs->getType()->getTypeID() << std::endl;
+        // std::cout << lhs->getType() << " " << rhs->getType() << std::endl;
         switch (this->Type)
         {
         case ADD:
@@ -338,12 +344,15 @@ llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
     }
     else
     {
-        ValuePtr lhs_double = context.typeSystem.cast(lhs, context.typeSystem.doubleTy, context.currentBlock());
-        ValuePtr rhs_double = context.typeSystem.cast(lhs, context.typeSystem.doubleTy, context.currentBlock());
-        if (lhs_double == nullptr || rhs_double == nullptr)
+        std::cout << lhs->getType()->getTypeID() << " " << rhs->getType()->getTypeID() << std::endl;
+        lhs = context.typeSystem.cast(lhs, context.typeSystem.doubleTy, context.currentBlock());
+        rhs = context.typeSystem.cast(rhs, context.typeSystem.doubleTy, context.currentBlock());
+        std::cout << lhs->getType()->getTypeID() << " " << rhs->getType()->getTypeID() << std::endl;
+        if (lhs== nullptr || rhs == nullptr)
         {
             return LogErrorV("The LHS or RHS has illegal type in BinaryOperatorStatement");
         }
+        std::cout<<lhs->getType()->getTypeID()<<" "<<rhs->getType()->getTypeID()<<std::endl;
         switch (this->Type)
         {
         case ADD:
@@ -692,6 +701,7 @@ llvm::Value *rmmc::IfStatement::codeGen(CodeGenContext &context)
 }
 llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
 {
+    this->print();
     FunctionPtr theFunction = context.theBuilder.GetInsertBlock()->getParent();
     BasicBlockPtr LoopEntryBB = llvm::BasicBlock::Create(context.theContext, "loop_entry", theFunction);
     BasicBlockPtr LoopBB = llvm::BasicBlock::Create(context.theContext, "loop");
@@ -704,13 +714,22 @@ llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
     // LoopEntryBlock content
     if (this->initial)
         this->initial->codeGen(context);
+    // std::cout<<"Initial Finished"<<std::endl;
     if (this->condition == nullptr)
     {
         return LogErrorV("The forStatement doesn't have jump condition");
     }
     ValuePtr condValue = this->condition->codeGen(context);
+    condValue = getActualValue(condValue, context);
+    // std::cout << "Finished"<<std::endl;
+    // condValue = getActualValue(condValue, context);
+    // std::cout << "Condition Start" << std::endl;
+    // std::cout << (llvm::ConstantFP::get(context.theContext, APFloat(0.0)) )->getType()<<std::endl;
+    std::cout << condValue->getType()->getTypeID() << std::endl; 
+    condValue = context.typeSystem.cast(condValue, context.typeSystem.doubleTy, context.currentBlock());
     condValue = context.theBuilder.CreateFCmpONE(
-        condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
+        llvm::ConstantFP::get(context.theContext, APFloat(0.0)), condValue,"loop_cond");
+    std::cout << "Condition Finished" << std::endl;
     if (condValue == nullptr)
     {
         return LogErrorV("The jump condition is illegal");
@@ -726,6 +745,8 @@ llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
         this->increment->codeGen(context);
     }
     condValue = this->condition->codeGen(context);
+    condValue = getActualValue(condValue, context);
+    condValue = context.typeSystem.cast(condValue, context.typeSystem.doubleTy, context.currentBlock());
     condValue = context.theBuilder.CreateFCmpONE(
         condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
     context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
