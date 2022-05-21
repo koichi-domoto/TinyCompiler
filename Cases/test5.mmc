@@ -1,11 +1,10 @@
-struct Point{
-	int x;
-	int y;
-}
 int main()
 {
-	struct Point p;
-	p.x=2;
-	printf("%d",p.x);
+	int x=4;
+	for(int i=0;i<3;i=i+1)
+	{
+		x=x-1;
+	}
+	printf("x=%d   ",x);
 	return 0;
 }

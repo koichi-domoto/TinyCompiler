@@ -1,16 +1,21 @@
+int sum(int a,int b)
+{
+	int z;
+	if(a>0)
+	{
+		z=sum(a-1,b-1);
+	}
+	else 
+	{
+		z=b;
+	}
+	return z;
+}
 int main()
 {
-	int res=0;
-	int[2][2] a = [1,2,3,4];
-	int[2][2] b = [1,2,3,4];
-	int i=0;
-	int j=0;
-	for(i=0;i<2;i=i+1){
-		for(j=0;j<2;j=j+1)
-		{
-			res = res + a[i][j]*b[i][j];
-		}
-	}
-	printf("res==%d",res);
+	int x=4;
+	int y=10;
+	int k=sum(x,y);
+	printf("k=%d    ",k);
 	return 0;
 }
