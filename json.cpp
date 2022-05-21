@@ -58,9 +58,13 @@ std::string IdentifierExpr::toJSON()
 {
 	//std::to_string()
 	std::vector<std::string> children;
-	children.push_back(to_json(Name));
-	children.push_back(to_json("isType",std::to_string(isType)));
-	children.push_back(to_json("isArray",std::to_string(isArray)));
+	children.push_back(to_json("Name",to_json(Name)));
+	if(isType==true)
+	children.push_back(to_json("isType",to_json("True")));
+	else children.push_back(to_json("isType",to_json("False")));
+	if(isArray==true)
+	children.push_back(to_json("isArray",to_json("True")));
+	else children.push_back(to_json("isArray",to_json("False")));
 	std::vector<std::string> Arry_content ;
 	int i=0;
     for (auto& Arry : *arraySize) {

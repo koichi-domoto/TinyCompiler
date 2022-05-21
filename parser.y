@@ -31,7 +31,7 @@
 %token <token> TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
 %token <token> TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT TSEMICOLON TLBRACKET TRBRACKET TQUOTATION
 %token <token> TPLUS TMINUS TMUL TDIV TAND TOR TXOR TMOD TNEG TNOT TSHIFTL TSHIFTR
-%token <token> TIF TELSE TFOR TWHILE TRETURN TSTRUCT TSCANF TPRINTF
+%token <token> TIF TELSE TFOR TWHILE TRETURN TSTRUCT TSCANF TPRINTF 
 
 %type <index> array_index
 %type <ident> ident primary_typename array_typename struct_typename typename 
@@ -114,7 +114,7 @@ ident : TIDENTIFIER { $$ = new rmmc::IdentifierExpr(*$1); }
 
 numeric : TINTEGER { $$ = new rmmc::IntegerExpr(atoi($1->c_str())); }
 				| TDOUBLE { $$ = new rmmc::DoubleExpr(atof($1->c_str())); }
-				| TLITERAL { $$ = new rmmc::StringExpr($1->c_str()); }
+				|  TLITERAL  { $$ = new rmmc::StringExpr($1->c_str()); }
 				;
 expr : 	assign { $$ = $1; }
 		 | ident TLPAREN call_args TRPAREN { $$ = new rmmc::FunctionCallExpr(std::shared_ptr<rmmc::IdentifierExpr>($1), std::shared_ptr<rmmc::ExpressionList>($3)); }

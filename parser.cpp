@@ -1746,7 +1746,7 @@ yyreduce:
 
   case 39:
 #line 117 "parser.y"
-                                           { (yyval.expr) = new rmmc::StringExpr((yyvsp[0].string)->c_str()); }
+                                             { (yyval.expr) = new rmmc::StringExpr((yyvsp[0].string)->c_str()); }
 #line 1751 "parser.cpp"
     break;
 
