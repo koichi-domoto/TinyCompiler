@@ -11,6 +11,6 @@ int main()
 			res = res + a[i][j]*b[i][j];
 		}
 	}
-	printf("res==%d",res);
+	printf("res==%d   ",res);
 	return 0;
 }

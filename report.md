@@ -691,5 +691,31 @@ int main()
 
 ![image-20220522011730861](C:/Users/LL/AppData/Roaming/Typora/typora-user-images/image-20220522011730861.png)	
 
+## 5.5 综合测试
 
+```c
+int main()
+{
+	int res=0;
+	int[2][2] a = [1,2,3,4];
+	int[2][2] b = [1,2,3,4];
+	int i=0;
+	int j=0;
+	for(i=0;i<2;i=i+1){
+		for(j=0;j<2;j=j+1)
+		{
+			res = res + a[i][j]*b[i][j];
+		}
+	}
+	printf("res==%d",res);
+	return 0;
+}
+```
 
+### 抽象树
+
+见test9.pdf
+
+### 输出结果
+
+![image-20220522131546186](../../AppData/Roaming/Typora/typora-user-images/image-20220522131546186.png)	

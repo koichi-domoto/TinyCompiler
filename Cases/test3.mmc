@@ -8,8 +8,7 @@ int main()
 	int a4;
 	a1=x+y;
 	a2=x-y;
-   	a3=x/y;
 	a4=x*y;
-	printf("a1=%d,a2=%d,a3=%d,a4=%d",a1,a2,a3,a4);
+	printf("a1=%d,a2=%d,a3=%d,a4=%d   ",a1,a2,a3,a4);
 	return 0;
 }
