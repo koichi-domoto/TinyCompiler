@@ -120,6 +120,7 @@ expr : 	assign { $$ = $1; }
 		 | ident TLPAREN call_args TRPAREN { $$ = new rmmc::FunctionCallExpr(std::shared_ptr<rmmc::IdentifierExpr>($1), std::shared_ptr<rmmc::ExpressionList>($3)); }
 		 | ident { $<ident>$ = $1; }
 		 | numeric
+		 | TAND expr { $$ = new SingleOperatorExpr(std::shared_ptr<rmmc::Expression>($2), rmmc::SingleOperator::ADDRESS_OF); }
 		 | expr comparison expr { $$ = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>($1), rmmc::BinaryOperator($2) , std::shared_ptr<rmmc::Expression>($3)); }
 		 | expr TMOD expr { $$ = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>($1), rmmc::BinaryOperator::MOD, std::shared_ptr<rmmc::Expression>($3)); }
 		 | expr TMUL expr { $$ = new rmmc::BinaryOperatorExpr(std::shared_ptr<rmmc::Expression>($1), rmmc::BinaryOperator::MUL, std::shared_ptr<rmmc::Expression>($3)); }

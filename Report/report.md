@@ -8,9 +8,13 @@
 
 ## 0.2 开发环境
 
-- 操作系统：目前编译器只支持RISC-V，推荐使用docker
-
-- 编译环境：Bison >3.8;flex >2.6;llvm >10.0.0
+- 操作系统：ubuntu20.04
+- 编译环境：
+  - Bison=3.5.1
+  - flex=2.6.4
+  - llvm=10.0.0
+  - clang=10.0.0-4ubuntu1
+  - make=4.2.1
 
 - 测试环境：Google test
 
@@ -23,13 +27,10 @@
 TinyCompiler
 ├── AST.h 抽象语法树节点的定义
 ├── AST.cpp 
-├── AST.json 抽象树可视化
-├── AST.json 
+├── json.cpp 抽象树可视化 
 ├── CodeGen.cpp 抽象语法树生成中间代码
-├── CodeGen.h
+├── CodeGen.h 生成中间代码类的定义和类型转换
 ├── Makefile
-├── ObjGen.cpp 中间代码生成目标代码
-├── ObjGen.h
 ├── report.pdf实验报告
 ├── out 可执行文件
 ├── tree.html 抽象树可视化渲染
@@ -91,7 +92,6 @@ TinyCompiler
 - int
 - double 
 - float
-- char
 - string
 - bool
 - struct
@@ -161,8 +161,6 @@ TinyCompiler
   ```
 
 - 运算符、赋值、函数参数的隐式类型转换
-
-- ……
 
 # 第一章 词法分析
 

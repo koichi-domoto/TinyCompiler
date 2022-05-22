@@ -71,10 +71,12 @@ llvm::Value *getActualValue(ValuePtr value, CodeGenContext &context)
     {
         return value;
     }
-    else if( value->getType()->getTypeID()==15 )
+    else if (value->getType()->getTypeID() == 15)
     {
         return context.theBuilder.CreateLoad(value);
-    }else{
+    }
+    else
+    {
         return value;
     }
 }
@@ -212,13 +214,15 @@ llvm::Value *rmmc::ArrayIndex::codeGen(CodeGenContext &context)
     for (auto &perIdx : *this->index)
     {
         ValuePtr val = getActualValue(perIdx->codeGen(context), context);
-        if( val->getType()->getTypeID() != llvm::Type::IntegerTyID ){
+        if (val->getType()->getTypeID() != llvm::Type::IntegerTyID)
+        {
             return LogErrorV("The index is illegal");
         }
         val_idx = context.theBuilder.CreateAdd(val_idx, val, "indexAdd");
         val_idx = getActualValue(val_idx, context);
 
-        if(i<arraySize->size()){
+        if (i < arraySize->size())
+        {
             val_idx = context.theBuilder.CreateMul(
                 val_idx,
                 (new IntegerExpr(arraySize->at(i)))->codeGen(context),
@@ -241,7 +245,7 @@ llvm::Value *rmmc::ArrayIndex::codeGen(CodeGenContext &context)
         //     i++;
         // }
     }
-    //Idxs.push_back( (new IntegerExpr(idx))->codeGen(context) );
+    // Idxs.push_back( (new IntegerExpr(idx))->codeGen(context) );
     Idxs.push_back(val_idx);
     ValuePtr array_i = context.theBuilder.CreateGEP(type, array, llvm::ArrayRef(Idxs));
     if (array_i == nullptr)
@@ -297,10 +301,13 @@ llvm::Value *rmmc::SingleOperatorExpr::codeGen(CodeGenContext &context)
 {
     this->print();
     ValuePtr exp = this->Expr->codeGen(context);
+    ValuePtr exp_val = getActualValue(exp, context);
     assert(exp != nullptr);
     ValuePtr con_neg_1 = llvm::ConstantInt::get(llvm::Type::getInt64Ty(context.theContext), -1);
     switch (Type)
     {
+    case ADDRESS_OF:
+        return exp;
     case Negative:
         return context.theBuilder.CreateFMul(exp, con_neg_1, "fmul");
     case LOGICAL_NOT:
@@ -311,21 +318,21 @@ llvm::Value *rmmc::SingleOperatorExpr::codeGen(CodeGenContext &context)
     return nullptr;
 }
 
-llvm::Value *StructMember(std::shared_ptr<Expression> LHS, std::shared_ptr<Expression> RHS, CodeGenContext& context)
+llvm::Value *StructMember(std::shared_ptr<Expression> LHS, std::shared_ptr<Expression> RHS, CodeGenContext &context)
 {
     ValuePtr lhs = LHS->codeGen(context);
     auto structPtr = context.theBuilder.CreateLoad(lhs, "structPtr");
-    //structPtr->setAlignment(4);
+    // structPtr->setAlignment(4);
     RHS->print();
-    IdentifierExpr* RHS_tmp = dynamic_cast<IdentifierExpr*>(RHS.get());
-    assert(RHS_tmp!=nullptr);
-    assert( structPtr->getType()->isStructTy() );
+    IdentifierExpr *RHS_tmp = dynamic_cast<IdentifierExpr *>(RHS.get());
+    assert(RHS_tmp != nullptr);
+    assert(structPtr->getType()->isStructTy());
 
     std::vector<ValuePtr> idxList;
     std::string structName = structPtr->getType()->getStructName().str();
     int memberIdx = context.getStructMemberId(structName, RHS_tmp->getName());
-    idxList.push_back( ConstantInt::get(context.typeSystem.intTy, 0, false) );
-    idxList.push_back( ConstantInt::get(context.typeSystem.intTy, (uint64_t)memberIdx, false));
+    idxList.push_back(ConstantInt::get(context.typeSystem.intTy, 0, false));
+    idxList.push_back(ConstantInt::get(context.typeSystem.intTy, (uint64_t)memberIdx, false));
 
     return context.theBuilder.CreateInBoundsGEP(lhs, idxList, "StructMemberPtr");
 }
@@ -333,7 +340,8 @@ llvm::Value *StructMember(std::shared_ptr<Expression> LHS, std::shared_ptr<Expre
 llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
 {
     this->print();
-    if( this->Type == BinaryOperator::STRUCT_REF ){
+    if (this->Type == BinaryOperator::STRUCT_REF)
+    {
         return StructMember(this->LHS, this->RHS, context);
     }
     ValuePtr lhs = this->LHS->codeGen(context);
@@ -341,14 +349,12 @@ llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
     assert(lhs != nullptr);
     assert(rhs != nullptr);
 
-    
-
     lhs = getActualValue(lhs, context);
     rhs = getActualValue(rhs, context);
 
     bool allInt = ((lhs->getType()->getTypeID() == llvm::Type::IntegerTyID) && (rhs->getType()->getTypeID() == llvm::Type::IntegerTyID));
 
-    std::cout<<"allInt== "<<allInt<<std::endl;
+    std::cout << "allInt== " << allInt << std::endl;
 
     if (allInt == true)
     {
@@ -392,11 +398,11 @@ llvm::Value *rmmc::BinaryOperatorExpr::codeGen(CodeGenContext &context)
         lhs = context.typeSystem.cast(lhs, context.typeSystem.doubleTy, context.currentBlock(), context);
         rhs = context.typeSystem.cast(rhs, context.typeSystem.doubleTy, context.currentBlock(), context);
         std::cout << lhs->getType()->getTypeID() << " " << rhs->getType()->getTypeID() << std::endl;
-        if (lhs== nullptr || rhs == nullptr)
+        if (lhs == nullptr || rhs == nullptr)
         {
             return LogErrorV("The LHS or RHS has illegal type in BinaryOperatorStatement");
         }
-        std::cout<<lhs->getType()->getTypeID()<<" "<<rhs->getType()->getTypeID()<<std::endl;
+        std::cout << lhs->getType()->getTypeID() << " " << rhs->getType()->getTypeID() << std::endl;
         switch (this->Type)
         {
         case ADD:
@@ -454,7 +460,10 @@ llvm::Value *rmmc::FunctionCallExpr::codeGen(CodeGenContext &context)
         for (it = this->Args->begin(); it != this->Args->end(); it++)
         {
             ValuePtr tmp = (*it)->codeGen(context);
-            tmp = getActualValue(tmp, context);
+            if (this->FunctionName->getName().compare("scanf"))
+            {
+                tmp = getActualValue(tmp, context);
+            }
             if (tmp == nullptr)
             {
                 return LogErrorV("The function params is nullptr");
@@ -611,7 +620,7 @@ llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context
     {
         TypePtr type = getLLVMType(this->VariableType, context);
         std::cout << "Variable Declaration Finished" << std::endl;
-        std::cout<<type->getTypeID()<<std::endl;
+        std::cout << type->getTypeID() << std::endl;
         ValuePtr alloca = context.theBuilder.CreateAlloca(type);
         std::cout << "Variable Declaration Finished" << std::endl;
         context.setSymbolTable(this->VariableName->getName(), alloca);
@@ -620,7 +629,7 @@ llvm::Value *rmmc::VariableDeclarationStatement::codeGen(CodeGenContext &context
         {
             std::make_shared<AssignmentExpression>(this->VariableName, this->assignmentExpr->at(0))->codeGen(context);
         }
-        std::cout<<"Variable Declaration Finished"<<std::endl;
+        std::cout << "Variable Declaration Finished" << std::endl;
         return alloca;
     }
     return nullptr;
@@ -665,12 +674,12 @@ llvm::Value *rmmc::StructDeclarationStatement::codeGen(CodeGenContext &context)
 
     context.addStruct(this->Name->getName());
     std::vector<TypePtr> memberType;
-    int memeberIdx=0;
+    int memeberIdx = 0;
     for (auto &perMember : *this->Members)
     {
         // perMember->codeGen(context);
         // std::cout<<"x finished"<<std::endl;
-        memberType.push_back( getLLVMType(perMember->VariableType, context) );
+        memberType.push_back(getLLVMType(perMember->VariableType, context));
         context.addStructMember(this->Name->getName(), perMember->VariableName->getName(), memeberIdx);
         memeberIdx++;
         // std::cout << "x finished" << std::endl;
@@ -711,20 +720,24 @@ llvm::Value *rmmc::TypedefStatement::codeGen(CodeGenContext &context)
     return nullptr;
 }
 
-llvm::Value* CastToBool(ValuePtr val, CodeGenContext& context)
+llvm::Value *CastToBool(ValuePtr val, CodeGenContext &context)
 {
     TypePtr from = val->getType();
     TypePtr type = context.typeSystem.doubleTy;
-    if(from != type){
-        std::cout<<"[TYPE CAST] : "<<from->getTypeID()<<" "<<type->getTypeID()<<std::endl;
-        if(context.typeSystem._castTable.find(from)==context.typeSystem._castTable.end()){
+    if (from != type)
+    {
+        std::cout << "[TYPE CAST] : " << from->getTypeID() << " " << type->getTypeID() << std::endl;
+        if (context.typeSystem._castTable.find(from) == context.typeSystem._castTable.end())
+        {
             return LogErrorV("No Cast");
         }
         else if (context.typeSystem._castTable[from].find(type) == context.typeSystem._castTable[from].end())
         {
             return LogErrorV("No Cast");
-        }else{
-            val=context.theBuilder.CreateCast(context.typeSystem._castTable[from][type], val, type, "cast");
+        }
+        else
+        {
+            val = context.theBuilder.CreateCast(context.typeSystem._castTable[from][type], val, type, "cast");
         }
     }
     val = context.theBuilder.CreateFCmpONE(
@@ -808,14 +821,14 @@ llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
     {
         this->increment->codeGen(context);
     }
-    //context.theBuilder.SetInsertPoint(LoopBB);
+    // context.theBuilder.SetInsertPoint(LoopBB);
     condValue = this->condition->codeGen(context);
     condValue = getActualValue(condValue, context);
 
     condValue = CastToBool(condValue, context);
 
     context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
-    
+
     theFunction->getBasicBlockList().push_back(LoopAfterBB);
     context.theBuilder.SetInsertPoint(LoopAfterBB);
 
@@ -847,7 +860,7 @@ llvm::Value *rmmc::ForStatement::codeGen(CodeGenContext &context)
 //     // condValue = getActualValue(condValue, context);
 //     // std::cout << "Condition Start" << std::endl;
 //     // std::cout << (llvm::ConstantFP::get(context.theContext, APFloat(0.0)) )->getType()<<std::endl;
-//     std::cout << condValue->getType()->getTypeID() << std::endl; 
+//     std::cout << condValue->getType()->getTypeID() << std::endl;
 //     condValue = context.typeSystem.cast(condValue, context.typeSystem.doubleTy, context.currentBlock());
 //     condValue = context.theBuilder.CreateFCmpONE(
 //         llvm::ConstantFP::get(context.theContext, APFloat(0.0)), condValue,"loop_cond");
@@ -908,7 +921,6 @@ llvm::Value *rmmc::WhileStatement::codeGen(CodeGenContext &context)
     condValue = context.theBuilder.CreateFCmpONE(
         condValue, ConstantFP::get(context.theContext, APFloat(0.0)), "loop_cond");
     context.theBuilder.CreateCondBr(condValue, LoopBB, LoopAfterBB);
-    
 
     theFunction->getBasicBlockList().push_back(LoopAfterBB);
     context.theBuilder.SetInsertPoint(LoopAfterBB);

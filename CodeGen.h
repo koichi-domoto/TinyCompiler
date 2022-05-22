@@ -94,25 +94,9 @@ namespace rmmc
                 std::cout << "No cast" << std::endl;
                 return nullptr;
             }
-//            return context.theBuilder.CreateCast(_castTable[from][type], value, type, "cast");
             return llvm::CastInst::Create(_castTable[from][type], value, type, "cast", block);
         }
-        // ValuePtr CastToBool(CodeGenContext& context, ValuePtr value)
-        // {
-        //     context.theBuilder.CreateIntCast();
-        //     if(value->getType()->getTypeID() == llvm::Type::IntegerTyID)
-        //     {
-        //         context.theBuilder.CreateICmpEQ()
-        //     }
-        // }
     };
-    // llvm::Type* getLLVMType(std::shared_ptr<IdentifierExpr> type, rmmc::CodeGenContext &context)
-    // {
-    //     std::string name=type->getName();
-    //     if( name.compare("int") )
-    //         return llvm::Type::getInt64Ty(context.theContext);
-    //     return nullptr;
-    // }
 
 }
 
@@ -147,11 +131,13 @@ namespace rmmc
         std::map<std::string, std::map<std::string, int> > structMembers;
 
         FunctionPtr getPrintf = nullptr;
+        FunctionPtr getScanf = nullptr;
 
 
         CodeGenContext() : typeSystem(theContext),theBuilder(theContext)
         {
             theModule = std::make_unique<llvm::Module>("main", this->theContext);
+
             const std::string name="printf";
             getPrintf = theModule->getFunction(llvm::StringRef(name));
             if(getPrintf==nullptr){
@@ -161,6 +147,17 @@ namespace rmmc
                     true
                 );
                 getPrintf = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, name.c_str(), theModule.get());
+            }
+
+            const std::string scanfName = "scanf";
+            getScanf = theModule->getFunction(llvm::StringRef(scanfName));
+            if (getScanf == nullptr)
+            {
+                FunctionTypePtr func_type = llvm::FunctionType::get(
+                    llvm::Type::getInt32Ty(theContext),
+                    {llvm::Type::getInt8PtrTy(theContext)},
+                    true);
+                getScanf = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, scanfName.c_str(), theModule.get());
             }
         }
 

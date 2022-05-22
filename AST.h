@@ -244,7 +244,7 @@ namespace rmmc
     public:
         SingleOperatorExpr(std::shared_ptr<Expression> _Expr, SingleOperator _Type)
             : Type(_Type),
-              Expr(std::move(_Expr))
+              Expr(_Expr)
         {
         }
         virtual ~SingleOperatorExpr() {}
